@@ -2,6 +2,8 @@
 
 HTML generator for server side rendering
 
+![.github/workflows/main.yaml](https://github.com/narumincho/html/workflows/.github/workflows/main.yaml/badge.svg)
+
 [![npm version](https://badge.fury.io/js/%40narumincho%2Fhtml.svg)](https://badge.fury.io/js/%40narumincho%2Fhtml)
 
 ```ts

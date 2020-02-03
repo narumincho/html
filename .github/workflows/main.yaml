@@ -23,6 +23,6 @@ jobs:
       - name: Transpile TypeScript (npx tsc)
         run: npx tsc
       - name: npm publish
-      - uses: JS-DevTools/npm-publish@v1
+        uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_AUTH_TOKEN }}
