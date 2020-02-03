@@ -1,0 +1,28 @@
+name: npm publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  npm-publish:
+    name: npm publish and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@master
+      - name: setup Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: "12.x"
+      - name: Install npm dependencies (npm ci)
+        run: npm ci
+      - name: npm test (using jest)
+        run: npx jest --verbose false
+      - name: Transpile TypeScript (npx tsc)
+        run: npx tsc
+      - name: npm publish
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_AUTH_TOKEN }}
