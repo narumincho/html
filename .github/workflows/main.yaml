@@ -32,7 +32,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.publish.version }}
+          tag_name: v${{ steps.publish.version }}
           release_name: Release ${{ steps.publish.version }}
           body: ""
           draft: false
