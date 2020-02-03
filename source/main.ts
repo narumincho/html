@@ -1,3 +1,8 @@
+/**
+ * div 要素。意味の持たないまとまり
+ * @param id id
+ * @param children 子要素
+ */
 export const div = (
   id: string | null,
   children: ReadonlyArray<Element> | string
@@ -166,7 +171,7 @@ export type Html = {
   /** スクリプトのURL */
   readonly scriptPath: ReadonlyArray<string>;
   /** 中身 */
-  readonly body: ReadonlyArray<Element> | string;
+  readonly body: ReadonlyArray<Element>;
 };
 
 export const enum Language {
@@ -217,16 +222,21 @@ export const toString = (html: Html): string =>
         {
           name: "body",
           attributes: new Map(),
-          children:
-            typeof html.body === "string"
-              ? {
+          children: {
+            _: HtmlElementChildren_.HtmlElementList,
+            value: html.body.concat([
+              {
+                name: "noscript",
+                attributes: new Map(),
+                children: {
                   _: HtmlElementChildren_.Text,
-                  text: html.body
+                  text:
+                    html.appName +
+                    "ではJavaScriptを使用します。ブラウザの設定で有効にしてください。"
                 }
-              : {
-                  _: HtmlElementChildren_.HtmlElementList,
-                  value: html.body
-                }
+              }
+            ])
+          }
         }
       ]
     }
