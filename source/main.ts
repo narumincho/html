@@ -154,8 +154,8 @@ export type Html = {
   readonly iconPath: ReadonlyArray<string>;
   /** ページのアイコン画像のパス。省略時は`iconPath`と同じになる */
   readonly pageIconPath?: ReadonlyArray<string>;
-  /** OGPに使われるカバー画像のパス */
-  readonly coverImagePath: ReadonlyArray<string>;
+  /** OGPに使われるカバー画像のURL */
+  readonly coverImageUrl: string;
   /** オリジン https://definy-lang.web.app のようなスキーマとドメインとポート番号をまとめたもの */
   readonly origin?: string;
   /** パス */
@@ -267,9 +267,7 @@ const headElement = (html: Html): Element => ({
       ogTitleElement(html.pageName),
       ogSiteName(html.appName),
       ogDescription(html.description),
-      ...(html.origin === undefined
-        ? []
-        : [ogImage(html.origin, html.coverImagePath)]),
+      ogImage(html.coverImageUrl),
       ...(html.script === undefined ? [] : [javaScriptElement(html.script)]),
       ...html.scriptPath.map(javaScriptElementByUrl)
     ]
@@ -366,11 +364,14 @@ const twitterCardElement = (twitterCard: TwitterCard): Element => ({
   children: { _: HtmlElementChildren_.NoEndTag }
 });
 
-const ogUrlElement = (orgin: string, path: ReadonlyArray<string>): Element => ({
+const ogUrlElement = (
+  origin: string,
+  path: ReadonlyArray<string>
+): Element => ({
   name: "meta",
   attributes: new Map([
     ["property", "og:url"],
-    ["content", orgin + "/" + path.map(escapeUrl).join("/")]
+    ["content", origin + "/" + path.map(escapeUrl).join("/")]
   ]),
   children: { _: HtmlElementChildren_.NoEndTag }
 });
@@ -408,14 +409,11 @@ const ogDescription = (description: string): Element => ({
   }
 });
 
-const ogImage = (
-  origin: string,
-  imagePath: ReadonlyArray<string>
-): Element => ({
+const ogImage = (url: string): Element => ({
   name: "meta",
   attributes: new Map([
     ["property", "og:image"],
-    ["content", origin + "/" + imagePath.map(escapeUrl).join("/")]
+    ["content", url]
   ]),
   children: {
     _: HtmlElementChildren_.NoEndTag

@@ -6,7 +6,7 @@ describe("test", () => {
     pageName: "ページ名",
     language: html.Language.Japanese,
     iconPath: ["icon"],
-    coverImagePath: ["cover-image"],
+    coverImageUrl: "https://narumincho.com/cover-image",
     description: "ページの説明",
     twitterCard: html.TwitterCard.SummaryCard,
     scriptPath: [],
