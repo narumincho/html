@@ -2,9 +2,9 @@
   "name": "@narumincho/html",
   "version": "0.0.0",
   "description": "HTML generator for server side rendering",
-  "main": "index.js",
+  "main": "distribution/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --watch --verbose false"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,18 @@
   "bugs": {
     "url": "https://github.com/narumincho/html/issues"
   },
-  "homepage": "https://github.com/narumincho/html#readme"
+  "homepage": "https://github.com/narumincho/html#readme",
+  "devDependencies": {
+    "@types/jest": "^25.1.1",
+    "@types/node": "^13.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.18.0",
+    "@typescript-eslint/parser": "^2.18.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "jest": "^25.1.0",
+    "prettier": "^1.19.1",
+    "ts-jest": "^25.1.0",
+    "typescript": "^3.7.5"
+  }
 }
