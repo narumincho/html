@@ -9,6 +9,7 @@ describe("test", () => {
     coverImagePath: ["cover-image"],
     description: "ページの説明",
     twitterCard: html.TwitterCard.SummaryCard,
+    scriptPath: [],
     body: [html.div(null, "それな")]
   };
   const htmlAsString: string = html.toString(sampleHtml);

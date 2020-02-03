@@ -77,7 +77,7 @@ export type Element = {
   /**
    * 属性名は正しい必要がある
    */
-  attributes: ReadonlyMap<string, string>;
+  attributes: ReadonlyMap<string, string | undefined>;
   /**
    * 子供。nullで閉じカッコなし `<img src="url" alt="image">`
    * `[]`や`""`の場合は `<script src="url"></script>`
@@ -163,6 +163,8 @@ export type Html = {
   readonly style?: string;
   /** ES Modules形式のJavaScript */
   readonly script?: string;
+  /** スクリプトのURL */
+  readonly scriptPath: ReadonlyArray<string>;
   /** 中身 */
   readonly body: ReadonlyArray<Element> | string;
 };
@@ -248,7 +250,6 @@ const headElement = (html: Html): Element => ({
         ? []
         : [manifestElement(html.manifestPath)]),
       ...(html.style === undefined ? [] : [cssStyleElement(html.style)]),
-      ...(html.script === undefined ? [] : [javaScriptElement(html.script)]),
       twitterCardElement(html.twitterCard),
       ...(html.origin === undefined || html.path === undefined
         ? []
@@ -258,7 +259,9 @@ const headElement = (html: Html): Element => ({
       ogDescription(html.description),
       ...(html.origin === undefined
         ? []
-        : [ogImage(html.origin, html.coverImagePath)])
+        : [ogImage(html.origin, html.coverImagePath)]),
+      ...(html.script === undefined ? [] : [javaScriptElement(html.script)]),
+      ...html.scriptPath.map(javaScriptElementByUrl)
     ]
   }
 });
@@ -344,12 +347,6 @@ const cssStyleElement = (code: string): Element => ({
   }
 });
 
-const javaScriptElement = (code: string): Element => ({
-  name: "script",
-  attributes: new Map([["type", "module"]]),
-  children: { _: HtmlElementChildren_.RawText, text: code }
-});
-
 const twitterCardElement = (twitterCard: TwitterCard): Element => ({
   name: "meta",
   attributes: new Map([
@@ -415,6 +412,24 @@ const ogImage = (
   }
 });
 
+const javaScriptElement = (code: string): Element => ({
+  name: "script",
+  attributes: new Map([["type", "module"]]),
+  children: { _: HtmlElementChildren_.RawText, text: code }
+});
+
+const javaScriptElementByUrl = (url: string): Element => ({
+  name: "script",
+  attributes: new Map([
+    ["defer", undefined],
+    ["src", url]
+  ]),
+  children: {
+    _: HtmlElementChildren_.HtmlElementList,
+    value: []
+  }
+});
+
 const escapeUrl = (text: string): string =>
   encodeURIComponent(text).replace(
     /[!'()*]/gu,
@@ -442,7 +457,7 @@ const htmlElementToString = (htmlElement: Element): string => {
 };
 
 const attributesToString = (
-  attributeMap: ReadonlyMap<string, string>
+  attributeMap: ReadonlyMap<string, string | undefined>
 ): string => {
   if (attributeMap.size === 0) {
     return "";
@@ -450,7 +465,9 @@ const attributesToString = (
   return (
     " " +
     [...attributeMap.entries()]
-      .map(([key, value]): string => key + '="' + escapeInHtml(value) + '"')
+      .map(([key, value]): string =>
+        value === undefined ? key : key + '="' + escapeInHtml(value) + '"'
+      )
       .join(" ")
   );
 };
