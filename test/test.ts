@@ -9,7 +9,10 @@ describe("test", () => {
     coverImageUrl: "https://narumincho.com/cover-image",
     description: "ページの説明",
     twitterCard: html.TwitterCard.SummaryCard,
-    scriptPath: [],
+    javaScriptMustBeAvailable: false,
+    origin: "https://narumincho.com",
+    path: [],
+    scriptUrlList: [],
     body: [html.div(null, "それな")]
   };
   const htmlAsString: string = html.toString(sampleHtml);
