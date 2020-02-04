@@ -168,6 +168,8 @@ export type Html = {
   readonly script?: string;
   /** スクリプトのURL */
   readonly scriptUrlList: ReadonlyArray<string>;
+  /** javaScriptが有効である必要があるか trueの場合は`<body>`に`<noscript>`での警告が表示される */
+  readonly javaScriptMustBeAvailable: boolean;
   /** 中身 */
   readonly body: ReadonlyArray<Element>;
 };
@@ -222,18 +224,22 @@ export const toString = (html: Html): string =>
           attributes: new Map(),
           children: {
             _: HtmlElementChildren_.HtmlElementList,
-            value: html.body.concat([
-              {
-                name: "noscript",
-                attributes: new Map(),
-                children: {
-                  _: HtmlElementChildren_.Text,
-                  text:
-                    html.appName +
-                    "ではJavaScriptを使用します。ブラウザの設定で有効にしてください。"
-                }
-              }
-            ])
+            value: html.body.concat(
+              html.javaScriptMustBeAvailable
+                ? [
+                    {
+                      name: "noscript",
+                      attributes: new Map(),
+                      children: {
+                        _: HtmlElementChildren_.Text,
+                        text:
+                          html.appName +
+                          "ではJavaScriptを使用します。ブラウザの設定で有効にしてください。"
+                      }
+                    }
+                  ]
+                : []
+            )
           }
         }
       ]
