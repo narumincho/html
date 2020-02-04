@@ -152,8 +152,6 @@ export type Html = {
   readonly themeColor?: string;
   /** アイコン画像のパス */
   readonly iconPath: ReadonlyArray<string>;
-  /** ページのアイコン画像のパス。省略時は`iconPath`と同じになる */
-  readonly pageIconPath?: ReadonlyArray<string>;
   /** OGPに使われるカバー画像のURL */
   readonly coverImageUrl: string;
   /** オリジン https://definy-lang.web.app のようなスキーマとドメインとポート番号をまとめたもの */
