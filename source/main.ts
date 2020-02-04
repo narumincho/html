@@ -169,7 +169,7 @@ export type Html = {
   /** ES Modules形式のJavaScript */
   readonly script?: string;
   /** スクリプトのURL */
-  readonly scriptPath: ReadonlyArray<string>;
+  readonly scriptUrlList: ReadonlyArray<string>;
   /** 中身 */
   readonly body: ReadonlyArray<Element>;
 };
@@ -269,7 +269,7 @@ const headElement = (html: Html): Element => ({
       ogDescription(html.description),
       ogImage(html.coverImageUrl),
       ...(html.script === undefined ? [] : [javaScriptElement(html.script)]),
-      ...html.scriptPath.map(javaScriptElementByUrl)
+      ...html.scriptUrlList.map(javaScriptElementByUrl)
     ]
   }
 });
