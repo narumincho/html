@@ -80,7 +80,9 @@ export const button = (
 export type Element = {
   name: string;
   /**
-   * 属性名は正しい必要がある
+   * 属性名は正しい必要がある。
+   * value=undefinedの意味は、属性値がないということ。
+   * `<button disabled>`
    */
   attributes: ReadonlyMap<string, string | undefined>;
   /**
