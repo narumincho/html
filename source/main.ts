@@ -129,7 +129,7 @@ export const section = (
 /**
  * 引用
  */
-export const blockquote = (
+export const quote = (
   attributes: Attributes & { cite?: URL },
   children: ReadonlyArray<Element> | string
 ): Element => ({
