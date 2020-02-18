@@ -162,11 +162,11 @@ export const code = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
-export const inputText = (
 /**
  * 1行テキストボックス。
  * nameでブラウザに覚えてもらうときのキーを指定できる
  */
+export const singleLineTextBox = (
   attributes: Attributes & { name: string }
 ): Element => ({
   name: "input",
