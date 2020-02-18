@@ -131,9 +131,9 @@ export const section = (
  */
 export const blockquote = (
   attributes: Attributes & { cite?: URL },
-  children: ReadonlyArray<Element>
+  children: ReadonlyArray<Element> | string
 ): Element => ({
-  name: "blockquote",
+  name: "quote",
   attributes:
     attributes.cite === undefined
       ? attributesToMap(attributes)
@@ -152,7 +152,7 @@ export const blockquote = (
  */
 export const code = (
   attributes: Attributes,
-  children: ReadonlyArray<Element>
+  children: ReadonlyArray<Element> | string
 ): Element => ({
   name: "blockquote",
   attributes: attributesToMap(attributes),
