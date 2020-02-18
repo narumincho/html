@@ -13,7 +13,7 @@ describe("test", () => {
     origin: "https://narumincho.com",
     path: [],
     scriptUrlList: [],
-    body: [html.div(null, "それな")]
+    body: [html.div({}, "それな")]
   };
   const htmlAsString: string = html.toString(sampleHtml);
   console.log(htmlAsString);

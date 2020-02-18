@@ -1,73 +1,100 @@
+export type Attributes = {
+  id?: string;
+  class?: string;
+};
+
+const attributesToMap = (
+  attributes: Attributes
+): ReadonlyMap<string, string | null> => {
+  const attributeMap: Map<string, string | null> = new Map();
+  if (attributes.id !== undefined) {
+    attributeMap.set("id", attributes.id);
+  }
+  if (attributes.class !== undefined) {
+    attributeMap.set("class", attributes.class);
+  }
+  return attributeMap;
+};
+
 /**
  * div 要素。意味の持たないまとまり
- * @param id id
+ * @param attributes id
  * @param children 子要素
  */
 export const div = (
-  id: string | null,
+  attributes: Attributes,
   children: ReadonlyArray<Element> | string
 ): Element => ({
   name: "div",
-  attributes: new Map(id === null ? [] : [["id", id]]),
+  attributes: attributesToMap(attributes),
   children:
     typeof children === "string"
       ? { _: HtmlElementChildren_.Text, text: children }
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
-export const h1 = (children: ReadonlyArray<Element> | string): Element => ({
+export const h1 = (
+  attributes: Attributes,
+  children: ReadonlyArray<Element> | string
+): Element => ({
   name: "h1",
-  attributes: new Map(),
+  attributes: attributesToMap(attributes),
   children:
     typeof children === "string"
       ? { _: HtmlElementChildren_.Text, text: children }
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
-export const h2 = (children: ReadonlyArray<Element> | string): Element => ({
+export const h2 = (
+  attributes: Attributes,
+  children: ReadonlyArray<Element> | string
+): Element => ({
   name: "h2",
-  attributes: new Map(),
+  attributes: attributesToMap(attributes),
   children:
     typeof children === "string"
       ? { _: HtmlElementChildren_.Text, text: children }
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
-export const h3 = (children: ReadonlyArray<Element> | string): Element => ({
+export const h3 = (
+  attributes: Attributes,
+  children: ReadonlyArray<Element> | string
+): Element => ({
   name: "h3",
-  attributes: new Map(),
+  attributes: attributesToMap(attributes),
   children:
     typeof children === "string"
       ? { _: HtmlElementChildren_.Text, text: children }
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
-export const section = (children: ReadonlyArray<Element>): Element => ({
+export const section = (
+  attributes: Attributes,
+  children: ReadonlyArray<Element>
+): Element => ({
   name: "section",
-  attributes: new Map(),
+  attributes: attributesToMap(attributes),
   children:
     typeof children === "string"
       ? { _: HtmlElementChildren_.Text, text: children }
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
-export const inputText = (id: string, name: string): Element => ({
+export const inputText = (attributes: Attributes, name: string): Element => ({
   name: "input",
-  attributes: new Map([
-    ["id", id],
-    ["name", name]
-  ]),
+  attributes: new Map([...attributesToMap(attributes), ["name", name]]),
   children: {
     _: HtmlElementChildren_.NoEndTag
   }
 });
 
 export const button = (
-  id: string,
+  attributes: Attributes,
   children: ReadonlyArray<Element> | string
 ): Element => ({
   name: "button",
-  attributes: new Map([["id", id]]),
+  attributes: attributesToMap(attributes),
   children:
     typeof children === "string"
       ? { _: HtmlElementChildren_.Text, text: children }
@@ -81,10 +108,10 @@ export type Element = {
   name: string;
   /**
    * 属性名は正しい必要がある。
-   * value=undefinedの意味は、属性値がないということ。
+   * value=nullの意味は、属性値がないということ。
    * `<button disabled>`
    */
-  attributes: ReadonlyMap<string, string | undefined>;
+  attributes: ReadonlyMap<string, string | null>;
   /**
    * 子供。nullで閉じカッコなし `<img src="url" alt="image">`
    * `[]`や`""`の場合は `<script src="url"></script>`
@@ -433,7 +460,7 @@ const javaScriptElement = (code: string): Element => ({
 const javaScriptElementByUrl = (url: string): Element => ({
   name: "script",
   attributes: new Map([
-    ["defer", undefined],
+    ["defer", null],
     ["src", url]
   ]),
   children: {
@@ -469,7 +496,7 @@ const htmlElementToString = (htmlElement: Element): string => {
 };
 
 const attributesToString = (
-  attributeMap: ReadonlyMap<string, string | undefined>
+  attributeMap: ReadonlyMap<string, string | null>
 ): string => {
   if (attributeMap.size === 0) {
     return "";
@@ -478,7 +505,7 @@ const attributesToString = (
     " " +
     [...attributeMap.entries()]
       .map(([key, value]): string =>
-        value === undefined ? key : key + '="' + escapeInHtml(value) + '"'
+        value === null ? key : key + '="' + escapeInHtml(value) + '"'
       )
       .join(" ")
   );
