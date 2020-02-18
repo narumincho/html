@@ -110,6 +110,27 @@ export const section = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+/**
+ * 引用
+ */
+export const blockquote = (
+  attributes: Attributes & { cite?: URL },
+  children: ReadonlyArray<Element>
+): Element => ({
+  name: "blockquote",
+  attributes:
+    attributes.cite === undefined
+      ? attributesToMap(attributes)
+      : new Map([
+          ...attributesToMap(attributes),
+          ["cite", attributes.cite.toString()]
+        ]),
+  children:
+    typeof children === "string"
+      ? { _: HtmlElementChildren_.Text, text: children }
+      : { _: HtmlElementChildren_.HtmlElementList, value: children }
+});
+
 export const inputText = (
   attributes: Attributes & { name: string }
 ): Element => ({
