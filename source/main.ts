@@ -1,3 +1,5 @@
+import { URL } from "url";
+
 export type Attributes = {
   id?: string;
   class?: string;
@@ -27,6 +29,21 @@ export const div = (
 ): Element => ({
   name: "div",
   attributes: attributesToMap(attributes),
+  children:
+    typeof children === "string"
+      ? { _: HtmlElementChildren_.Text, text: children }
+      : { _: HtmlElementChildren_.HtmlElementList, value: children }
+});
+
+export const anchorLink = (
+  attributes: Attributes & { url: URL },
+  children: ReadonlyArray<Element> | string
+): Element => ({
+  name: "a",
+  attributes: new Map([
+    ...attributesToMap(attributes),
+    ["href", attributes.url.toString()]
+  ]),
   children:
     typeof children === "string"
       ? { _: HtmlElementChildren_.Text, text: children }
