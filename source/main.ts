@@ -50,6 +50,18 @@ export const anchorLink = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+export const image = (
+  attributes: Attributes & { url: URL; alternativeText: string }
+): Element => ({
+  name: "img",
+  attributes: new Map([
+    ...attributesToMap(attributes),
+    ["src", attributes.url.toString()],
+    ["alt", attributes.alternativeText]
+  ]),
+  children: { _: HtmlElementChildren_.NoEndTag }
+});
+
 export const h1 = (
   attributes: Attributes,
   children: ReadonlyArray<Element> | string
