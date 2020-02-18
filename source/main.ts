@@ -110,9 +110,14 @@ export const section = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
-export const inputText = (attributes: Attributes, name: string): Element => ({
+export const inputText = (
+  attributes: Attributes & { name: string }
+): Element => ({
   name: "input",
-  attributes: new Map([...attributesToMap(attributes), ["name", name]]),
+  attributes: new Map([
+    ...attributesToMap(attributes),
+    ["name", attributes.name]
+  ]),
   children: {
     _: HtmlElementChildren_.NoEndTag
   }
