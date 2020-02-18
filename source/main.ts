@@ -154,7 +154,7 @@ export const code = (
   attributes: Attributes,
   children: ReadonlyArray<Element> | string
 ): Element => ({
-  name: "blockquote",
+  name: "code",
   attributes: attributesToMap(attributes),
   children:
     typeof children === "string"
