@@ -1,6 +1,6 @@
 {
   "name": "@narumincho/html",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "HTML generator for server side rendering",
   "main": "distribution/main.js",
   "scripts": {
