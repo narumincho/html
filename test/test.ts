@@ -1,4 +1,5 @@
 import * as html from "../source/main";
+import { URL } from "url";
 
 describe("test", () => {
   const sampleHtml: html.Html = {
@@ -6,7 +7,7 @@ describe("test", () => {
     pageName: "ページ名",
     language: html.Language.Japanese,
     iconPath: ["icon"],
-    coverImageUrl: "https://narumincho.com/cover-image",
+    coverImageUrl: new URL("https://narumincho.com/assets/kamausagi.png"),
     description: "ページの説明",
     twitterCard: html.TwitterCard.SummaryCard,
     javaScriptMustBeAvailable: false,

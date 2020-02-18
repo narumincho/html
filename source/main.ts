@@ -275,7 +275,7 @@ export type Html = {
   /** アイコン画像のパス */
   readonly iconPath: ReadonlyArray<string>;
   /** OGPに使われるカバー画像のURL */
-  readonly coverImageUrl: string;
+  readonly coverImageUrl: URL;
   /** オリジン https://definy-lang.web.app のようなスキーマとドメインとポート番号をまとめたもの */
   readonly origin: string;
   /** パス */
@@ -533,11 +533,11 @@ const ogDescription = (description: string): Element => ({
   }
 });
 
-const ogImage = (url: string): Element => ({
+const ogImage = (url: URL): Element => ({
   name: "meta",
   attributes: new Map([
     ["property", "og:image"],
-    ["content", url]
+    ["content", url.toString()]
   ]),
   children: {
     _: HtmlElementChildren_.NoEndTag
