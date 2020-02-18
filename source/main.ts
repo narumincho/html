@@ -1,3 +1,5 @@
+import { URL } from "url";
+
 export type Attributes = {
   id?: string;
   class?: string;
@@ -17,9 +19,7 @@ const attributesToMap = (
 };
 
 /**
- * div 要素。意味の持たないまとまり
- * @param attributes id
- * @param children 子要素
+ * 意味の持たないまとまり
  */
 export const div = (
   attributes: Attributes,
@@ -33,6 +33,42 @@ export const div = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+/**
+ * リンク
+ */
+export const anchorLink = (
+  attributes: Attributes & { url: URL },
+  children: ReadonlyArray<Element> | string
+): Element => ({
+  name: "a",
+  attributes: new Map([
+    ...attributesToMap(attributes),
+    ["href", attributes.url.toString()]
+  ]),
+  children:
+    typeof children === "string"
+      ? { _: HtmlElementChildren_.Text, text: children }
+      : { _: HtmlElementChildren_.HtmlElementList, value: children }
+});
+
+/**
+ * 画像
+ */
+export const image = (
+  attributes: Attributes & { url: URL; alternativeText: string }
+): Element => ({
+  name: "img",
+  attributes: new Map([
+    ...attributesToMap(attributes),
+    ["src", attributes.url.toString()],
+    ["alt", attributes.alternativeText]
+  ]),
+  children: { _: HtmlElementChildren_.NoEndTag }
+});
+
+/**
+ * 見出し
+ */
 export const h1 = (
   attributes: Attributes,
   children: ReadonlyArray<Element> | string
@@ -45,6 +81,9 @@ export const h1 = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+/**
+ * 見出し
+ */
 export const h2 = (
   attributes: Attributes,
   children: ReadonlyArray<Element> | string
@@ -57,6 +96,9 @@ export const h2 = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+/**
+ * 見出し
+ */
 export const h3 = (
   attributes: Attributes,
   children: ReadonlyArray<Element> | string
@@ -69,6 +111,9 @@ export const h3 = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+/**
+ * 区切り
+ */
 export const section = (
   attributes: Attributes,
   children: ReadonlyArray<Element>
@@ -81,14 +126,62 @@ export const section = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
-export const inputText = (attributes: Attributes, name: string): Element => ({
+/**
+ * 引用
+ */
+export const blockquote = (
+  attributes: Attributes & { cite?: URL },
+  children: ReadonlyArray<Element>
+): Element => ({
+  name: "blockquote",
+  attributes:
+    attributes.cite === undefined
+      ? attributesToMap(attributes)
+      : new Map([
+          ...attributesToMap(attributes),
+          ["cite", attributes.cite.toString()]
+        ]),
+  children:
+    typeof children === "string"
+      ? { _: HtmlElementChildren_.Text, text: children }
+      : { _: HtmlElementChildren_.HtmlElementList, value: children }
+});
+
+/**
+ * プログラムのコード
+ */
+export const code = (
+  attributes: Attributes,
+  children: ReadonlyArray<Element>
+): Element => ({
+  name: "blockquote",
+  attributes: attributesToMap(attributes),
+  children:
+    typeof children === "string"
+      ? { _: HtmlElementChildren_.Text, text: children }
+      : { _: HtmlElementChildren_.HtmlElementList, value: children }
+});
+
+/**
+ * 1行テキストボックス。
+ * nameでブラウザに覚えてもらうときのキーを指定できる
+ */
+export const singleLineTextBox = (
+  attributes: Attributes & { name: string }
+): Element => ({
   name: "input",
-  attributes: new Map([...attributesToMap(attributes), ["name", name]]),
+  attributes: new Map([
+    ...attributesToMap(attributes),
+    ["name", attributes.name]
+  ]),
   children: {
     _: HtmlElementChildren_.NoEndTag
   }
 });
 
+/**
+ * ボタン
+ */
 export const button = (
   attributes: Attributes,
   children: ReadonlyArray<Element> | string
