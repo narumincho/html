@@ -19,9 +19,7 @@ const attributesToMap = (
 };
 
 /**
- * div 要素。意味の持たないまとまり
- * @param attributes id
- * @param children 子要素
+ * 意味の持たないまとまり
  */
 export const div = (
   attributes: Attributes,
@@ -35,6 +33,9 @@ export const div = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+/**
+ * リンク
+ */
 export const anchorLink = (
   attributes: Attributes & { url: URL },
   children: ReadonlyArray<Element> | string
@@ -50,6 +51,9 @@ export const anchorLink = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+/**
+ * 画像
+ */
 export const image = (
   attributes: Attributes & { url: URL; alternativeText: string }
 ): Element => ({
@@ -62,6 +66,9 @@ export const image = (
   children: { _: HtmlElementChildren_.NoEndTag }
 });
 
+/**
+ * 見出し
+ */
 export const h1 = (
   attributes: Attributes,
   children: ReadonlyArray<Element> | string
@@ -74,6 +81,9 @@ export const h1 = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+/**
+ * 見出し
+ */
 export const h2 = (
   attributes: Attributes,
   children: ReadonlyArray<Element> | string
@@ -86,6 +96,9 @@ export const h2 = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+/**
+ * 見出し
+ */
 export const h3 = (
   attributes: Attributes,
   children: ReadonlyArray<Element> | string
@@ -98,6 +111,9 @@ export const h3 = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+/**
+ * 区切り
+ */
 export const section = (
   attributes: Attributes,
   children: ReadonlyArray<Element>
@@ -147,6 +163,10 @@ export const code = (
 });
 
 export const inputText = (
+/**
+ * 1行テキストボックス。
+ * nameでブラウザに覚えてもらうときのキーを指定できる
+ */
   attributes: Attributes & { name: string }
 ): Element => ({
   name: "input",
@@ -159,6 +179,9 @@ export const inputText = (
   }
 });
 
+/**
+ * ボタン
+ */
 export const button = (
   attributes: Attributes,
   children: ReadonlyArray<Element> | string
