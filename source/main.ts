@@ -131,6 +131,21 @@ export const blockquote = (
       : { _: HtmlElementChildren_.HtmlElementList, value: children }
 });
 
+/**
+ * プログラムのコード
+ */
+export const code = (
+  attributes: Attributes,
+  children: ReadonlyArray<Element>
+): Element => ({
+  name: "blockquote",
+  attributes: attributesToMap(attributes),
+  children:
+    typeof children === "string"
+      ? { _: HtmlElementChildren_.Text, text: children }
+      : { _: HtmlElementChildren_.HtmlElementList, value: children }
+});
+
 export const inputText = (
   attributes: Attributes & { name: string }
 ): Element => ({
