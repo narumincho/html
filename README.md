@@ -22,6 +22,7 @@ const sampleHtml: html.Html = {
   origin: "https://narumincho.com",
   path: [],
   scriptUrlList: [],
+  styleUrlList: [],
   body: [html.div({}, "それな")]
 };
 

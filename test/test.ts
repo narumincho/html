@@ -14,6 +14,7 @@ describe("test", () => {
     origin: "https://narumincho.com",
     path: [],
     scriptUrlList: [],
+    styleUrlList: [],
     body: [html.div({}, "それな")]
   };
   const htmlAsString: string = html.toString(sampleHtml);
