@@ -350,10 +350,12 @@ export type Html = {
   readonly twitterCard: TwitterCard;
   /** スタイル。CSS */
   readonly style?: string;
+  /** スタイルのURL */
+  readonly styleUrlList: ReadonlyArray<URL>;
   /** ES Modules形式のJavaScript */
   readonly script?: string;
   /** スクリプトのURL */
-  readonly scriptUrlList: ReadonlyArray<string>;
+  readonly scriptUrlList: ReadonlyArray<URL>;
   /** javaScriptが有効である必要があるか trueの場合は`<body>`に`<noscript>`での警告が表示される */
   readonly javaScriptMustBeAvailable: boolean;
   /** 中身 */
@@ -457,7 +459,8 @@ const headElement = (html: Html): Element => ({
       ogDescription(html.description),
       ogImage(html.coverImageUrl),
       ...(html.script === undefined ? [] : [javaScriptElement(html.script)]),
-      ...html.scriptUrlList.map(javaScriptElementByUrl)
+      ...html.scriptUrlList.map(javaScriptElementByUrl),
+      ...html.styleUrlList.map(styleElementByUrl)
     ]
   }
 });
@@ -608,23 +611,27 @@ const ogImage = (url: URL): Element => ({
   }
 });
 
-const javaScriptElement = (code: string): Element => ({
-  name: "script",
-  attributes: new Map([["type", "module"]]),
-  children: { _: HtmlElementChildren_.RawText, text: code }
-});
+const javaScriptElement = (code: string): Element =>
+  customizeElementRawText("script", new Map([["type", "module"]]), code);
 
-const javaScriptElementByUrl = (url: string): Element => ({
-  name: "script",
-  attributes: new Map([
-    ["defer", null],
-    ["src", url]
-  ]),
-  children: {
-    _: HtmlElementChildren_.HtmlElementList,
-    value: []
-  }
-});
+const javaScriptElementByUrl = (url: URL): Element =>
+  customizeElement(
+    "script",
+    new Map([
+      ["defer", null],
+      ["src", url.toString()]
+    ]),
+    []
+  );
+
+const styleElementByUrl = (url: URL): Element =>
+  customizeElementWithNoEndTag(
+    "link",
+    new Map([
+      ["rel", "stylesheet"],
+      ["href", url.toString()]
+    ])
+  );
 
 const escapeUrl = (text: string): string =>
   encodeURIComponent(text).replace(
