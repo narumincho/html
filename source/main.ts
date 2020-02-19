@@ -195,6 +195,71 @@ export const button = (
 });
 
 /**
+ * @narumincho/htmlにないHTML要素を使いたいときに使うもの
+ * @param name 要素名
+ * @param attributes 属性
+ * @param children 子要素
+ */
+export const customizeElement = (
+  name: string,
+  attributes: ReadonlyMap<string, string | null>,
+  children: ReadonlyArray<Element> | string
+): Element => ({
+  name,
+  attributes,
+  children:
+    typeof children === "string"
+      ? { _: HtmlElementChildren_.Text, text: children }
+      : { _: HtmlElementChildren_.HtmlElementList, value: children }
+});
+
+/**
+ * エスケープしないカスタマイズ要素
+ * ```html
+ * <script type="x-shader/x-vertex">
+ * attribute vec3 position;
+ * uniform   mat4 mvpMatrix;
+ *
+ * void main(void) {
+ *     gl_Position = mvpMatrix * vec4(position, 1.0);
+ * }
+ * </script>
+ * ```
+ * @param name 要素名
+ * @param attributes 属性
+ * @param text エスケープしないテキスト
+ */
+export const customizeElementRawText = (
+  name: string,
+  attributes: ReadonlyMap<string, string | null>,
+  text: string
+): Element => ({
+  name,
+  attributes,
+  children: {
+    _: HtmlElementChildren_.RawText,
+    text
+  }
+});
+
+/**
+ * 閉じタグがないカスタマイズ要素
+ * `<meta name="rafya">`
+ * @param name 要素名
+ * @param attributes 属性
+ */
+export const customizeElementWithNoEndTag = (
+  name: string,
+  attributes: ReadonlyMap<string, string | null>
+): Element => ({
+  name,
+  attributes,
+  children: {
+    _: HtmlElementChildren_.NoEndTag
+  }
+});
+
+/**
  * HtmlElement (need validated)
  */
 export type Element = {
@@ -206,8 +271,7 @@ export type Element = {
    */
   attributes: ReadonlyMap<string, string | null>;
   /**
-   * 子供。nullで閉じカッコなし `<img src="url" alt="image">`
-   * `[]`や`""`の場合は `<script src="url"></script>`
+   * 子供。
    * `<path d="M1,2 L20,53"/>`のような閉じカッコの省略はしない
    */
   children: HtmlElementChildren;
