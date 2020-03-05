@@ -308,7 +308,9 @@ export const enum Language {
   /** 日本語 `ja` */
   Japanese,
   /** 英語 `en` */
-  English
+  English,
+  /** エスペラント `eo` */
+  Esperanto
 }
 
 const languageToIETFLanguageTag = (language: Language): string => {
@@ -317,6 +319,8 @@ const languageToIETFLanguageTag = (language: Language): string => {
       return "ja";
     case Language.English:
       return "en";
+    case Language.Esperanto:
+      return "eo";
   }
 };
 
