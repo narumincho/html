@@ -11,8 +11,7 @@ describe("test", () => {
     description: "ページの説明",
     twitterCard: html.TwitterCard.SummaryCard,
     javaScriptMustBeAvailable: false,
-    origin: "https://narumincho.com",
-    path: [],
+    url: new URL("https://narumincho.com"),
     scriptUrlList: [],
     styleUrlList: [],
     body: [html.div({}, "それな")]
