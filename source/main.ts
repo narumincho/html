@@ -282,10 +282,8 @@ export type Html = {
   readonly iconPath: ReadonlyArray<string>;
   /** OGPに使われるカバー画像のURL */
   readonly coverImageUrl: URL;
-  /** オリジン https://definy-lang.web.app のようなスキーマとドメインとポート番号をまとめたもの */
-  readonly origin: string;
-  /** パス */
-  readonly path: ReadonlyArray<string>;
+  /** ページのURL */
+  readonly url: URL;
   /** マニフェストのパス */
   readonly manifestPath?: ReadonlyArray<string>;
   /** Twitter Card。Twitterでシェアしたときの表示をどうするか */
@@ -391,7 +389,7 @@ const headElement = (html: Html): Element =>
       : [manifestElement(html.manifestPath)]),
     ...(html.style === undefined ? [] : [cssStyleElement(html.style)]),
     twitterCardElement(html.twitterCard),
-    ogUrlElement(html.origin, html.path),
+    ogUrlElement(html.url),
     ogTitleElement(html.pageName),
     ogSiteName(html.appName),
     ogDescription(html.description),
@@ -465,12 +463,12 @@ const twitterCardElement = (twitterCard: TwitterCard): Element =>
     ])
   );
 
-const ogUrlElement = (origin: string, path: ReadonlyArray<string>): Element =>
+const ogUrlElement = (url: URL): Element =>
   elementNoEndTag(
     "meta",
     new Map([
       ["property", "og:url"],
-      ["content", origin + "/" + path.map(escapeUrl).join("/")]
+      ["content", url.toString()]
     ])
   );
 
