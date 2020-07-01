@@ -28,12 +28,13 @@ jobs:
         with:
           token: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: create release tag
-        uses: actions/create-release@v1
+        if: steps.publish.outputs.type != 'none'
+        uses: actions/create-release@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.publish.version }}
-          release_name: Release ${{ steps.publish.version }}
+          tag_name: ${{ steps.publish.outputs.version }}
+          release_name: Release ${{ steps.publish.outputs.version }}
           body: ""
           draft: false
           prerelease: false
