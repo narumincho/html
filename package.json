@@ -2,7 +2,7 @@
   "name": "@narumincho/html",
   "version": "0.1.1",
   "description": "HTML generator for server side rendering",
-  "main": "distribution/main.js",
+  "main": "source/main.js",
   "scripts": {
     "test": "jest --watch --verbose false"
   },

@@ -2,3 +2,5 @@ node_modules
 test
 source
 .github
+*.ts
+!*.d.ts

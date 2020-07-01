@@ -6,7 +6,6 @@
     "strict": true,
     "moduleResolution": "node",
     "newLine": "LF",
-    "outDir": "distribution",
     "declaration": true
   },
   "exclude": ["test/**"]
