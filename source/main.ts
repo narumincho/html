@@ -37,7 +37,7 @@ export const anchorLink = (
     "a",
     new Map([
       ...attributesToMap(attributes),
-      ["href", attributes.url.toString()]
+      ["href", attributes.url.toString()],
     ]),
     children
   );
@@ -53,7 +53,7 @@ export const image = (
     new Map([
       ...attributesToMap(attributes),
       ["src", attributes.url.toString()],
-      ["alt", attributes.alternativeText]
+      ["alt", attributes.alternativeText],
     ])
   );
 
@@ -102,7 +102,7 @@ export const quote = (
       ? attributesToMap(attributes)
       : new Map([
           ...attributesToMap(attributes),
-          ["cite", attributes.cite.toString()]
+          ["cite", attributes.cite.toString()],
         ]),
     children
   );
@@ -151,8 +151,8 @@ export const element = (
   attributes,
   children:
     typeof children === "string"
-      ? { _: HtmlElementChildren_.Text, text: children }
-      : { _: HtmlElementChildren_.HtmlElementList, value: children }
+      ? { _: "Text", text: children }
+      : { _: "HtmlElementList", value: children },
 });
 
 /**
@@ -179,9 +179,9 @@ export const elementRawText = (
   name,
   attributes,
   children: {
-    _: HtmlElementChildren_.RawText,
-    text
-  }
+    _: "RawText",
+    text,
+  },
 });
 
 /**
@@ -197,8 +197,8 @@ export const elementNoEndTag = (
   name,
   attributes,
   children: {
-    _: HtmlElementChildren_.NoEndTag
-  }
+    _: "NoEndTag",
+  },
 });
 
 /**
@@ -224,48 +224,29 @@ export type Element = {
  */
 export type HtmlElementChildren =
   | {
-      _: HtmlElementChildren_.HtmlElementList;
+      _: "HtmlElementList";
       value: ReadonlyArray<Element>;
     }
   | {
-      _: HtmlElementChildren_.Text;
+      _: "Text";
       text: string;
     }
   | {
-      _: HtmlElementChildren_.RawText;
+      _: "RawText";
       text: string;
     }
   | {
-      _: HtmlElementChildren_.NoEndTag;
+      _: "NoEndTag";
     };
-
-/**
- * パターンマッチングのみに使う
- */
-export const enum HtmlElementChildren_ {
-  HtmlElementList,
-  /**
-   * 中の文字列をエスケープする
-   */
-  Text,
-  /**
-   * 中の文字列をそのまま扱う `<script>`用
-   */
-  RawText,
-  /**
-   * 閉じカッコなし `<img src="url" alt="image">`
-   */
-  NoEndTag
-}
 
 export const escapeInHtml = (text: string): string =>
   text
-    .replace(/&/g, "&amp;")
-    .replace(/>/g, "&gt;")
-    .replace(/</g, "&lt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;")
-    .replace(/`/g, "&#x60;");
+    .replace(/&/gu, "&amp;")
+    .replace(/>/gu, "&gt;")
+    .replace(/</gu, "&lt;")
+    .replace(/"/gu, "&quot;")
+    .replace(/'/gu, "&#x27;")
+    .replace(/`/gu, "&#x60;");
 
 export type Html = {
   /** 使用している言語 */
@@ -308,7 +289,7 @@ export const enum Language {
   /** 英語 `en` */
   English,
   /** エスペラント `eo` */
-  Esperanto
+  Esperanto,
 }
 
 const languageToIETFLanguageTag = (language: Language): string => {
@@ -326,7 +307,7 @@ export const enum TwitterCard {
   /** 画像を横に並べて表示 */
   SummaryCard,
   /** 画像を大きく表示 */
-  SummaryCardWithLargeImage
+  SummaryCardWithLargeImage,
 }
 
 const twitterCardToString = (twitterCard: TwitterCard): string => {
@@ -360,16 +341,16 @@ export const toString = (html: Html): string =>
                     name: "noscript",
                     attributes: new Map(),
                     children: {
-                      _: HtmlElementChildren_.Text,
+                      _: "Text",
                       text:
                         html.appName +
-                        "ではJavaScriptを使用します。ブラウザの設定で有効にしてください。"
-                    }
-                  }
+                        "ではJavaScriptを使用します。ブラウザの設定で有効にしてください。",
+                    },
+                  },
                 ]
               : []
           )
-        )
+        ),
       ]
     )
   );
@@ -396,7 +377,7 @@ const headElement = (html: Html): Element =>
     ogImage(html.coverImageUrl),
     ...(html.script === undefined ? [] : [javaScriptElement(html.script)]),
     ...html.scriptUrlList.map(javaScriptElementByUrl),
-    ...html.styleUrlList.map(styleElementByUrl)
+    ...html.styleUrlList.map(styleElementByUrl),
   ]);
 
 const charsetElement: Element = elementNoEndTag(
@@ -408,7 +389,7 @@ const viewportElement: Element = elementNoEndTag(
   "meta",
   new Map([
     ["name", "viewport"],
-    ["content", "width=device-width,initial-scale=1.0"]
+    ["content", "width=device-width,initial-scale=1.0"],
   ])
 );
 
@@ -420,7 +401,7 @@ const descriptionElement = (description: string): Element =>
     "meta",
     new Map([
       ["name", "description"],
-      ["content", description]
+      ["content", description],
     ])
   );
 
@@ -429,7 +410,7 @@ const themeColorElement = (themeColor: string): Element =>
     "meta",
     new Map([
       ["name", "theme-color"],
-      ["content", themeColor]
+      ["content", themeColor],
     ])
   );
 
@@ -438,7 +419,7 @@ const iconElement = (iconPath: ReadonlyArray<string>): Element =>
     "link",
     new Map([
       ["rel", "icon"],
-      ["href", "/" + iconPath.map(escapeUrl).join("/")]
+      ["href", "/" + iconPath.map(escapeUrl).join("/")],
     ])
   );
 
@@ -447,19 +428,19 @@ const manifestElement = (path: ReadonlyArray<string>): Element =>
     "link",
     new Map([
       ["rel", "manifest"],
-      ["href", "/" + path.map(escapeUrl).join("/")]
+      ["href", "/" + path.map(escapeUrl).join("/")],
     ])
   );
 
-const cssStyleElement = (code: string): Element =>
-  elementRawText("style", new Map(), code);
+const cssStyleElement = (cssCode: string): Element =>
+  elementRawText("style", new Map(), cssCode);
 
 const twitterCardElement = (twitterCard: TwitterCard): Element =>
   elementNoEndTag(
     "meta",
     new Map([
       ["name", "twitter:card"],
-      ["content", twitterCardToString(twitterCard)]
+      ["content", twitterCardToString(twitterCard)],
     ])
   );
 
@@ -468,7 +449,7 @@ const ogUrlElement = (url: URL): Element =>
     "meta",
     new Map([
       ["property", "og:url"],
-      ["content", url.toString()]
+      ["content", url.toString()],
     ])
   );
 
@@ -477,7 +458,7 @@ const ogTitleElement = (title: string): Element =>
     "meta",
     new Map([
       ["property", "og:title"],
-      ["content", title]
+      ["content", title],
     ])
   );
 
@@ -486,7 +467,7 @@ const ogSiteName = (siteName: string): Element =>
     "meta",
     new Map([
       ["property", "og:site_name"],
-      ["content", siteName]
+      ["content", siteName],
     ])
   );
 
@@ -495,7 +476,7 @@ const ogDescription = (description: string): Element =>
     "meta",
     new Map([
       ["property", "og:description"],
-      ["content", description]
+      ["content", description],
     ])
   );
 
@@ -504,19 +485,19 @@ const ogImage = (url: URL): Element =>
     "meta",
     new Map([
       ["property", "og:image"],
-      ["content", url.toString()]
+      ["content", url.toString()],
     ])
   );
 
-const javaScriptElement = (code: string): Element =>
-  elementRawText("script", new Map([["type", "module"]]), code);
+const javaScriptElement = (javaScriptCode: string): Element =>
+  elementRawText("script", new Map([["type", "module"]]), javaScriptCode);
 
 const javaScriptElementByUrl = (url: URL): Element =>
   element(
     "script",
     new Map([
       ["defer", null],
-      ["src", url.toString()]
+      ["src", url.toString()],
     ]),
     []
   );
@@ -526,7 +507,7 @@ const styleElementByUrl = (url: URL): Element =>
     "link",
     new Map([
       ["rel", "stylesheet"],
-      ["href", url.toString()]
+      ["href", url.toString()],
     ])
   );
 
@@ -541,17 +522,17 @@ const htmlElementToString = (htmlElement: Element): string => {
     "<" + htmlElement.name + attributesToString(htmlElement.attributes) + ">";
   const endTag = "</" + htmlElement.name + ">";
   switch (htmlElement.children._) {
-    case HtmlElementChildren_.HtmlElementList:
+    case "HtmlElementList":
       return (
         startTag +
         htmlElement.children.value.map(htmlElementToString).join("") +
         endTag
       );
-    case HtmlElementChildren_.Text:
+    case "Text":
       return startTag + escapeInHtml(htmlElement.children.text) + endTag;
-    case HtmlElementChildren_.RawText:
+    case "RawText":
       return startTag + htmlElement.children.text + endTag;
-    case HtmlElementChildren_.NoEndTag:
+    case "NoEndTag":
       return startTag;
   }
 };

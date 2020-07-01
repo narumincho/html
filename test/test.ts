@@ -14,7 +14,7 @@ describe("test", () => {
     url: new URL("https://narumincho.com"),
     scriptUrlList: [],
     styleUrlList: [],
-    body: [html.div({}, "それな")]
+    body: [html.div({}, "それな")],
   };
   const htmlAsString: string = html.toString(sampleHtml);
   console.log(htmlAsString);
