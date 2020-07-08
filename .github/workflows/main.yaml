@@ -3,19 +3,17 @@ name: npm publish
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   npm-publish:
     name: npm publish and test
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repository
-        uses: actions/checkout@master
-      - name: setup Node.js
-        uses: actions/setup-node@master
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: "12"
       - name: Install npm dependencies (npm ci)
         run: npm ci
       - name: npm test (using jest)
