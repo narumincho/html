@@ -6,6 +6,7 @@
     "strict": true,
     "moduleResolution": "Node",
     "newLine": "lf",
+    "declaration": true,
     "forceConsistentCasingInFileNames": true
   }
 }

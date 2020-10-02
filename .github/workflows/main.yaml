@@ -18,8 +18,10 @@ jobs:
         run: npm ci
       - name: npm test (using jest)
         run: npx jest --verbose false
-      - name: Transpile TypeScript (npx tsc)
-        run: npx tsc
+      - name: Transpile TypeScript Source (npx tsc)
+        run: npx tsc --project source/tsconfig.json
+      - name: Transpile TypeScript Schema (npx tsc)
+        run: npx tsc --project schema/tsconfig.json
       - name: npm publish
         id: publish
         uses: JS-DevTools/npm-publish@v1

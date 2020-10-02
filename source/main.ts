@@ -1,5 +1,3 @@
-import { URL } from "url";
-
 export type Attributes = {
   id?: string;
   class?: string;
@@ -283,38 +281,26 @@ export type Html = {
   readonly body: ReadonlyArray<Element>;
 };
 
-export const enum Language {
-  /** 日本語 `ja` */
-  Japanese,
-  /** 英語 `en` */
-  English,
-  /** エスペラント `eo` */
-  Esperanto,
-}
+export type Language = "Japanese" | "English" | "Esperanto";
 
 const languageToIETFLanguageTag = (language: Language): string => {
   switch (language) {
-    case Language.Japanese:
+    case "Japanese":
       return "ja";
-    case Language.English:
+    case "English":
       return "en";
-    case Language.Esperanto:
+    case "Esperanto":
       return "eo";
   }
 };
 
-export const enum TwitterCard {
-  /** 画像を横に並べて表示 */
-  SummaryCard,
-  /** 画像を大きく表示 */
-  SummaryCardWithLargeImage,
-}
+export type TwitterCard = "SummaryCard" | "SummaryCardWithLargeImage";
 
 const twitterCardToString = (twitterCard: TwitterCard): string => {
   switch (twitterCard) {
-    case TwitterCard.SummaryCard:
+    case "SummaryCard":
       return "summary";
-    case TwitterCard.SummaryCardWithLargeImage:
+    case "SummaryCardWithLargeImage":
       return "summary_large_image";
   }
 };
