@@ -19,6 +19,6 @@ describe("test", () => {
   const htmlAsString: string = html.toString(sampleHtml);
   console.log(htmlAsString);
   it("include doctype html", () => {
-    expect(htmlAsString).toMatch(/!doctype html/u);
+    expect(htmlAsString).toMatchSnapshot();
   });
 });
