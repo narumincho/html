@@ -6,6 +6,7 @@
     "strict": true,
     "moduleResolution": "Node",
     "newLine": "lf",
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "noUncheckedIndexedAccess": true
   }
 }

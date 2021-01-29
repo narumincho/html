@@ -1,4 +1,4 @@
-import * as d from "definy-core/source/data";
+export type Language = "Japanese" | "English" | "Esperanto";
 
 export type Attributes = {
   id?: string;
@@ -250,7 +250,7 @@ export const escapeInHtml = (text: string): string =>
 
 export type Html = {
   /** 使用している言語 */
-  readonly language?: d.Language;
+  readonly language?: Language;
   /** アプリの名前 */
   readonly appName: string;
   /** タブなどに表示されるページのタイトル */
@@ -283,7 +283,7 @@ export type Html = {
   readonly body: ReadonlyArray<Element>;
 };
 
-const languageToIETFLanguageTag = (language: d.Language): string => {
+const languageToIETFLanguageTag = (language: Language): string => {
   switch (language) {
     case "Japanese":
       return "ja";
