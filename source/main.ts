@@ -1,4 +1,4 @@
-import { Language } from "./data";
+import { Language, TwitterCard } from "./data";
 
 export type Attributes = {
   id?: string;
@@ -293,8 +293,6 @@ const languageToIETFLanguageTag = (language: Language): string => {
       return "eo";
   }
 };
-
-export type TwitterCard = "SummaryCard" | "SummaryCardWithLargeImage";
 
 const twitterCardToString = (twitterCard: TwitterCard): string => {
   switch (twitterCard) {

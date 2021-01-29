@@ -1,4 +1,4 @@
-import { Language } from "./data";
+import { Language, TwitterCard } from "./data";
 
 export type View<Message> = {
   /**
@@ -12,9 +12,57 @@ export type View<Message> = {
    * アプリ名 / サイト名 (HTML出力のみ反映)
    */
   readonly appName: string;
+
+  /**
+   * ページの説明 (HTML出力のみ反映)
+   */
+  readonly description: string;
+
+  /**
+   * テーマカラー
+   */
   readonly themeColor: Color | undefined;
+
+  /**
+   * アイコン画像のパス. /から始まる必要がある
+   */
+  readonly iconPath: string;
+
+  /**
+   * 使用している言語
+   */
   readonly language: Language | undefined;
+
+  /**
+   * OGPに使われるカバー画像のURL (CORSの制限を受けない)
+   */
+  readonly coverImageUrl: URL;
+
+  /** ページのURL */
+  readonly url: URL;
+
+  /** マニフェストのパス */
+  readonly manifestPath?: ReadonlyArray<string>;
+
+  /** Twitter Card。Twitterでシェアしたときの表示をどうするか */
+  readonly twitterCard: TwitterCard;
+
+  /** 全体に適応されるスタイル. CSS */
+  readonly style?: string;
+
+  /** スタイルのURL */
+  readonly styleUrlList: ReadonlyArray<URL>;
+
+  /** ES Modules形式のJavaScript */
+  readonly script?: string;
+
+  /** スクリプトのURL */
+  readonly scriptUrlList: ReadonlyArray<URL>;
+
+  /** body の class */
   readonly bodyClass: string;
+
+  /** body の 子要素 */
   readonly children: Children<Message>;
 };
 
