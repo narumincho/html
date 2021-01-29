@@ -23,16 +23,16 @@ const attributesToMap = (
  */
 export const div = (
   attributes: Attributes,
-  children: ReadonlyArray<Element> | string
-): Element => element("div", attributesToMap(attributes), children);
+  children: ReadonlyArray<RawElement> | string
+): RawElement => element("div", attributesToMap(attributes), children);
 
 /**
  * リンク
  */
 export const anchorLink = (
   attributes: Attributes & { url: URL },
-  children: ReadonlyArray<Element> | string
-): Element =>
+  children: ReadonlyArray<RawElement> | string
+): RawElement =>
   element(
     "a",
     new Map([
@@ -47,7 +47,7 @@ export const anchorLink = (
  */
 export const image = (
   attributes: Attributes & { url: URL; alternativeText: string }
-): Element =>
+): RawElement =>
   elementNoEndTag(
     "img",
     new Map([
@@ -62,40 +62,40 @@ export const image = (
  */
 export const h1 = (
   attributes: Attributes,
-  children: ReadonlyArray<Element> | string
-): Element => element("h1", attributesToMap(attributes), children);
+  children: ReadonlyArray<RawElement> | string
+): RawElement => element("h1", attributesToMap(attributes), children);
 
 /**
  * 見出し
  */
 export const h2 = (
   attributes: Attributes,
-  children: ReadonlyArray<Element> | string
-): Element => element("h2", attributesToMap(attributes), children);
+  children: ReadonlyArray<RawElement> | string
+): RawElement => element("h2", attributesToMap(attributes), children);
 
 /**
  * 見出し
  */
 export const h3 = (
   attributes: Attributes,
-  children: ReadonlyArray<Element> | string
-): Element => element("h3", attributesToMap(attributes), children);
+  children: ReadonlyArray<RawElement> | string
+): RawElement => element("h3", attributesToMap(attributes), children);
 
 /**
  * 区切り
  */
 export const section = (
   attributes: Attributes,
-  children: ReadonlyArray<Element>
-): Element => element("section", attributesToMap(attributes), children);
+  children: ReadonlyArray<RawElement>
+): RawElement => element("section", attributesToMap(attributes), children);
 
 /**
  * 引用
  */
 export const quote = (
   attributes: Attributes & { cite?: URL },
-  children: ReadonlyArray<Element> | string
-): Element =>
+  children: ReadonlyArray<RawElement> | string
+): RawElement =>
   element(
     "quote",
     attributes.cite === undefined
@@ -112,8 +112,8 @@ export const quote = (
  */
 export const code = (
   attributes: Attributes,
-  children: ReadonlyArray<Element> | string
-): Element => element("code", attributesToMap(attributes), children);
+  children: ReadonlyArray<RawElement> | string
+): RawElement => element("code", attributesToMap(attributes), children);
 
 /**
  * 1行テキストボックス。
@@ -121,7 +121,7 @@ export const code = (
  */
 export const singleLineTextBox = (
   attributes: Attributes & { name: string }
-): Element =>
+): RawElement =>
   elementNoEndTag(
     "input",
     new Map([...attributesToMap(attributes), ["name", attributes.name]])
@@ -132,8 +132,8 @@ export const singleLineTextBox = (
  */
 export const button = (
   attributes: Attributes,
-  children: ReadonlyArray<Element> | string
-): Element => element("button", attributesToMap(attributes), children);
+  children: ReadonlyArray<RawElement> | string
+): RawElement => element("button", attributesToMap(attributes), children);
 
 /**
  * @narumincho/htmlにないHTML要素を使いたいときに使うもの。
@@ -145,14 +145,14 @@ export const button = (
 export const element = (
   name: string,
   attributes: ReadonlyMap<string, string | null>,
-  children: ReadonlyArray<Element> | string
-): Element => ({
+  children: ReadonlyArray<RawElement> | string
+): RawElement => ({
   name,
   attributes,
   children:
     typeof children === "string"
-      ? { _: "Text", text: children }
-      : { _: "HtmlElementList", value: children },
+      ? { tag: "Text", text: children }
+      : { tag: "HtmlElementList", value: children },
 });
 
 /**
@@ -171,15 +171,15 @@ export const element = (
  * @param attributes 属性
  * @param text エスケープしないテキスト
  */
-export const elementRawText = (
+const elementRawText = (
   name: string,
   attributes: ReadonlyMap<string, string | null>,
   text: string
-): Element => ({
+): RawElement => ({
   name,
   attributes,
   children: {
-    _: "RawText",
+    tag: "RawText",
     text,
   },
 });
@@ -193,18 +193,18 @@ export const elementRawText = (
 export const elementNoEndTag = (
   name: string,
   attributes: ReadonlyMap<string, string | null>
-): Element => ({
+): RawElement => ({
   name,
   attributes,
   children: {
-    _: "NoEndTag",
+    tag: "NoEndTag",
   },
 });
 
 /**
  * HtmlElement (need validated)
  */
-export type Element = {
+export type RawElement = {
   name: string;
   /**
    * 属性名は正しい必要がある。
@@ -216,27 +216,27 @@ export type Element = {
    * 子供。
    * `<path d="M1,2 L20,53"/>`のような閉じカッコの省略はしない
    */
-  children: HtmlElementChildren;
+  children: RawChildren;
 };
 
 /**
  * 子要素のパターン。パターンマッチングのみに使う
  */
-export type HtmlElementChildren =
+export type RawChildren =
   | {
-      _: "HtmlElementList";
-      value: ReadonlyArray<Element>;
+      tag: "HtmlElementList";
+      value: ReadonlyArray<RawElement>;
     }
   | {
-      _: "Text";
+      tag: "Text";
       text: string;
     }
   | {
-      _: "RawText";
+      tag: "RawText";
       text: string;
     }
   | {
-      _: "NoEndTag";
+      tag: "NoEndTag";
     };
 
 export const escapeInHtml = (text: string): string =>
@@ -280,7 +280,7 @@ export type Html = {
   /** javaScriptが有効である必要があるか trueの場合は`<body>`に`<noscript>`での警告が表示される */
   readonly javaScriptMustBeAvailable: boolean;
   /** 中身 */
-  readonly body: ReadonlyArray<Element>;
+  readonly body: ReadonlyArray<RawElement>;
 };
 
 const languageToIETFLanguageTag = (language: Language): string => {
@@ -327,7 +327,7 @@ export const toString = (html: Html): string =>
                     name: "noscript",
                     attributes: new Map(),
                     children: {
-                      _: "Text",
+                      tag: "Text",
                       text:
                         html.appName +
                         "ではJavaScriptを使用します。ブラウザの設定で有効にしてください。",
@@ -341,7 +341,7 @@ export const toString = (html: Html): string =>
     )
   );
 
-const headElement = (html: Html): Element =>
+const headElement = (html: Html): RawElement =>
   element("head", new Map(), [
     charsetElement,
     viewportElement,
@@ -366,12 +366,12 @@ const headElement = (html: Html): Element =>
     ...html.styleUrlList.map(styleElementByUrl),
   ]);
 
-const charsetElement: Element = elementNoEndTag(
+const charsetElement: RawElement = elementNoEndTag(
   "meta",
   new Map([["charset", "utf-8"]])
 );
 
-const viewportElement: Element = elementNoEndTag(
+const viewportElement: RawElement = elementNoEndTag(
   "meta",
   new Map([
     ["name", "viewport"],
@@ -379,10 +379,10 @@ const viewportElement: Element = elementNoEndTag(
   ])
 );
 
-const pageNameElement = (pageName: string): Element =>
+const pageNameElement = (pageName: string): RawElement =>
   element("title", new Map(), pageName);
 
-const descriptionElement = (description: string): Element =>
+const descriptionElement = (description: string): RawElement =>
   elementNoEndTag(
     "meta",
     new Map([
@@ -391,7 +391,7 @@ const descriptionElement = (description: string): Element =>
     ])
   );
 
-const themeColorElement = (themeColor: string): Element =>
+const themeColorElement = (themeColor: string): RawElement =>
   elementNoEndTag(
     "meta",
     new Map([
@@ -400,7 +400,7 @@ const themeColorElement = (themeColor: string): Element =>
     ])
   );
 
-const iconElement = (iconPath: ReadonlyArray<string>): Element =>
+const iconElement = (iconPath: ReadonlyArray<string>): RawElement =>
   elementNoEndTag(
     "link",
     new Map([
@@ -409,7 +409,7 @@ const iconElement = (iconPath: ReadonlyArray<string>): Element =>
     ])
   );
 
-const manifestElement = (path: ReadonlyArray<string>): Element =>
+const manifestElement = (path: ReadonlyArray<string>): RawElement =>
   elementNoEndTag(
     "link",
     new Map([
@@ -418,10 +418,10 @@ const manifestElement = (path: ReadonlyArray<string>): Element =>
     ])
   );
 
-const cssStyleElement = (cssCode: string): Element =>
+const cssStyleElement = (cssCode: string): RawElement =>
   elementRawText("style", new Map(), cssCode);
 
-const twitterCardElement = (twitterCard: TwitterCard): Element =>
+const twitterCardElement = (twitterCard: TwitterCard): RawElement =>
   elementNoEndTag(
     "meta",
     new Map([
@@ -430,7 +430,7 @@ const twitterCardElement = (twitterCard: TwitterCard): Element =>
     ])
   );
 
-const ogUrlElement = (url: URL): Element =>
+const ogUrlElement = (url: URL): RawElement =>
   elementNoEndTag(
     "meta",
     new Map([
@@ -439,7 +439,7 @@ const ogUrlElement = (url: URL): Element =>
     ])
   );
 
-const ogTitleElement = (title: string): Element =>
+const ogTitleElement = (title: string): RawElement =>
   elementNoEndTag(
     "meta",
     new Map([
@@ -448,7 +448,7 @@ const ogTitleElement = (title: string): Element =>
     ])
   );
 
-const ogSiteName = (siteName: string): Element =>
+const ogSiteName = (siteName: string): RawElement =>
   elementNoEndTag(
     "meta",
     new Map([
@@ -457,7 +457,7 @@ const ogSiteName = (siteName: string): Element =>
     ])
   );
 
-const ogDescription = (description: string): Element =>
+const ogDescription = (description: string): RawElement =>
   elementNoEndTag(
     "meta",
     new Map([
@@ -466,7 +466,7 @@ const ogDescription = (description: string): Element =>
     ])
   );
 
-const ogImage = (url: URL): Element =>
+const ogImage = (url: URL): RawElement =>
   elementNoEndTag(
     "meta",
     new Map([
@@ -475,10 +475,10 @@ const ogImage = (url: URL): Element =>
     ])
   );
 
-const javaScriptElement = (javaScriptCode: string): Element =>
+const javaScriptElement = (javaScriptCode: string): RawElement =>
   elementRawText("script", new Map([["type", "module"]]), javaScriptCode);
 
-const javaScriptElementByUrl = (url: URL): Element =>
+const javaScriptElementByUrl = (url: URL): RawElement =>
   element(
     "script",
     new Map([
@@ -488,7 +488,7 @@ const javaScriptElementByUrl = (url: URL): Element =>
     []
   );
 
-const styleElementByUrl = (url: URL): Element =>
+const styleElementByUrl = (url: URL): RawElement =>
   elementNoEndTag(
     "link",
     new Map([
@@ -503,11 +503,11 @@ const escapeUrl = (text: string): string =>
     (c: string) => "%" + c.charCodeAt(0).toString(16)
   );
 
-const htmlElementToString = (htmlElement: Element): string => {
+const htmlElementToString = (htmlElement: RawElement): string => {
   const startTag =
     "<" + htmlElement.name + attributesToString(htmlElement.attributes) + ">";
   const endTag = "</" + htmlElement.name + ">";
-  switch (htmlElement.children._) {
+  switch (htmlElement.children.tag) {
     case "HtmlElementList":
       return (
         startTag +
