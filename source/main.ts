@@ -1,4 +1,4 @@
-export type Language = "Japanese" | "English" | "Esperanto";
+import { Language } from "./data";
 
 export type Attributes = {
   id?: string;
