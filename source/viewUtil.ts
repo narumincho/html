@@ -236,14 +236,16 @@ const idOrUndefined = (idValue: string | undefined): string =>
 
 export const view = <Message>(
   option: {
-    readonly title: string;
+    readonly appName: string;
+    readonly pageName: string;
     readonly themeColor?: Color;
     readonly language: Language;
     readonly style?: CSSObject;
   },
   children: ReadonlyMap<string, Element<Message>> | string
 ): View<Message> => ({
-  title: option.title,
+  pageName: option.pageName,
+  appName: option.appName,
   themeColor: option.themeColor,
   language: option.language,
   bodyClass: css(option.style),

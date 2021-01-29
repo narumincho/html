@@ -703,7 +703,7 @@ export const renderView = <Message>(
   view: v.View<Message>,
   patchState: PatchState<Message>
 ): void => {
-  document.title = view.title;
+  document.title = view.pageName;
   const themeColorMetaElement = getOrCreateThemeColorMetaElement();
   if (view.themeColor === undefined) {
     themeColorMetaElement.remove();
@@ -751,7 +751,7 @@ export const patchViewOperation = (
   patchOperation: v.ViewPatchOperation
 ): void => {
   switch (patchOperation.tag) {
-    case "changeTitle":
+    case "changePageName":
       document.title = patchOperation.newTitle;
       return;
     case "changeThemeColor": {

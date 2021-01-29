@@ -1,7 +1,17 @@
 import { Language } from "./data";
 
 export type View<Message> = {
-  readonly title: string;
+  /**
+   * ページ名
+   *
+   * Google 検索のページ名や, タブ, ブックマークのタイトル, OGPのタイトルなどに使用される
+   */
+  readonly pageName: string;
+
+  /**
+   * アプリ名 / サイト名 (HTML出力のみ反映)
+   */
+  readonly appName: string;
   readonly themeColor: Color | undefined;
   readonly language: Language | undefined;
   readonly bodyClass: string;
@@ -19,7 +29,7 @@ export type ViewDiff<Message> = {
 };
 
 export type ViewPatchOperation =
-  | { tag: "changeTitle"; newTitle: string }
+  | { tag: "changePageName"; newTitle: string }
   | { tag: "changeThemeColor"; newThemeColor: Color | undefined }
   | { tag: "changeLanguage"; newLanguage: Language | undefined }
   | { tag: "changeBodyClass"; newClass: string };

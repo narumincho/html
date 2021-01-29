@@ -21,8 +21,11 @@ export const createViewDiff = <Message>(
   newView: View<Message>
 ): ViewDiff<Message> => {
   const newPatchOperationList: Array<ViewPatchOperation> = [];
-  if (oldView.title !== newView.title) {
-    newPatchOperationList.push({ tag: "changeTitle", newTitle: newView.title });
+  if (oldView.pageName !== newView.pageName) {
+    newPatchOperationList.push({
+      tag: "changePageName",
+      newTitle: newView.pageName,
+    });
   }
   if (!isEqualColor(oldView.themeColor, newView.themeColor)) {
     newPatchOperationList.push({
