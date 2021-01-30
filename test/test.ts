@@ -1,21 +1,26 @@
-import * as html from "../source/main";
+import * as toString from "../source/toString";
+import * as view from "../source/view";
+import * as viewUtil from "../source/viewUtil";
 
 describe("test", () => {
-  const sampleHtml: html.Html = {
-    appName: "アプリ名",
-    pageName: "ページ名",
+  const sampleHtml: view.View<never> = {
+    appName: "テストアプリ",
+    pageName: "テストページ",
     language: "Japanese",
-    iconPath: ["icon"],
+    iconPath: "/icon",
     coverImageUrl: new URL("https://narumincho.com/assets/kamausagi.png"),
     description: "ページの説明",
     twitterCard: "SummaryCard",
-    javaScriptMustBeAvailable: false,
     url: new URL("https://narumincho.com"),
     scriptUrlList: [],
     styleUrlList: [],
-    body: [html.div({}, "それな")],
+    bodyClass: viewUtil.styleToBodyClass(),
+    children: view.childrenElementList(
+      new Map([["e", viewUtil.div({}, "それな")]])
+    ),
+    themeColor: undefined,
   };
-  const htmlAsString: string = html.toString(sampleHtml);
+  const htmlAsString: string = toString.toString(sampleHtml);
   console.log(htmlAsString);
   it("include doctype html", () => {
     expect(htmlAsString).toMatchSnapshot();
