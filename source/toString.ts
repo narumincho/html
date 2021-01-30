@@ -28,48 +28,6 @@ const attributesToMap = (
 };
 
 /**
- * 意味の持たないまとまり
- * @deprecated
- */
-export const div = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => rawElement("div", attributesToMap(attributes), children);
-
-/**
- * リンク
- * @deprecated
- */
-export const anchorLink = (
-  attributes: Attributes & { url: URL },
-  children: ReadonlyArray<RawElement> | string
-): RawElement =>
-  rawElement(
-    "a",
-    new Map([
-      ...attributesToMap(attributes),
-      ["href", attributes.url.toString()],
-    ]),
-    children
-  );
-
-/**
- * 画像
- * @deprecated
- */
-export const image = (
-  attributes: Attributes & { url: URL; alternativeText: string }
-): RawElement =>
-  rawElementNoEndTag(
-    "img",
-    new Map([
-      ...attributesToMap(attributes),
-      ["src", attributes.url.toString()],
-      ["alt", attributes.alternativeText],
-    ])
-  );
-
-/**
  * 見出し
  * @deprecated
  */
@@ -132,28 +90,6 @@ export const code = (
   attributes: Attributes,
   children: ReadonlyArray<RawElement> | string
 ): RawElement => rawElement("code", attributesToMap(attributes), children);
-
-/**
- * 1行テキストボックス。
- * nameでブラウザに覚えてもらうときのキーを指定できる
- * @deprecated
- */
-export const singleLineTextBox = (
-  attributes: Attributes & { name: string }
-): RawElement =>
-  rawElementNoEndTag(
-    "input",
-    new Map([...attributesToMap(attributes), ["name", attributes.name]])
-  );
-
-/**
- * ボタン
- * @deprecated
- */
-export const button = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => rawElement("button", attributesToMap(attributes), children);
 
 /**
  * @narumincho/htmlにないHTML要素を使いたいときに使うもの。

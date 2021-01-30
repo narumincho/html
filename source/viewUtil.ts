@@ -2,17 +2,19 @@ import { CSSObject, css } from "@emotion/css";
 import {
   Children,
   ClickMessageData,
-  Color,
   Element,
-  View,
   childrenElementList,
   childrenElementListTag,
   childrenText,
   childrenTextTag,
 } from "./view";
-import { Language } from "./data";
 import { mapMapValue } from "./util";
 
+/**
+ * ```html
+ * <div>
+ * ```
+ */
 export const div = <Message>(
   option: {
     id?: string;
@@ -35,6 +37,11 @@ export const div = <Message>(
   children: childrenFromStringOrElementMap(children),
 });
 
+/**
+ * ```html
+ * <a href="URL">
+ * ```
+ */
 export const externalLink = <Message>(
   option: {
     id?: string;
@@ -50,6 +57,12 @@ export const externalLink = <Message>(
   children: childrenFromStringOrElementMap(children),
 });
 
+/**
+ * ```html
+ * <a href="URL">
+ * ```
+ * `externalLink` とは違い, jumpMessage の発火を優先し, 新しいタブを開くような動作をしたら 通常の `<a>` と同じ動きをする
+ */
 export const localLink = <Message>(
   option: {
     id?: string;
@@ -67,6 +80,11 @@ export const localLink = <Message>(
   children: childrenFromStringOrElementMap(children),
 });
 
+/**
+ * ```html
+ * <button>
+ * ```
+ */
 export const button = <Message>(
   option: {
     id?: string;
@@ -82,7 +100,12 @@ export const button = <Message>(
   children: childrenFromStringOrElementMap(children),
 });
 
-export const img = <Message>(option: {
+/**
+ * ```html
+ * <img alt="画像の代替テキスト" src="URL か blob URL">
+ * ```
+ */
+export const image = <Message>(option: {
   id?: string;
   style?: CSSObject;
   alt: string;
@@ -96,6 +119,11 @@ export const img = <Message>(option: {
   src: option.src,
 });
 
+/**
+ * ```html
+ * <input type="radio">
+ * ```
+ */
 export const inputRadio = <Message>(option: {
   id?: string;
   style?: CSSObject;
@@ -112,6 +140,11 @@ export const inputRadio = <Message>(option: {
   select: option.select,
 });
 
+/**
+ * ```html
+ * <input type="text">
+ * ```
+ */
 export const inputOneLineText = <Message>(option: {
   id?: string;
   style?: CSSObject;
@@ -125,6 +158,11 @@ export const inputOneLineText = <Message>(option: {
   inputOrReadonly: option.inputOrReadonly,
 });
 
+/**
+ * ```html
+ * <textarea>
+ * ```
+ */
 export const inputMultiLineText = <Message>(option: {
   id?: string;
   style?: CSSObject;
@@ -138,6 +176,11 @@ export const inputMultiLineText = <Message>(option: {
   inputOrReadonly: option.inputOrReadonly,
 });
 
+/**
+ * ```html
+ * <label>
+ * ```
+ */
 export const label = (
   option: { id?: string; style?: CSSObject; targetElementId: string },
   children: ReadonlyMap<string, Element<never>> | string
@@ -149,6 +192,11 @@ export const label = (
   children: childrenFromStringOrElementMap(children),
 });
 
+/**
+ * ```html
+ * <svg>
+ * ```
+ */
 export const svg = <Message>(
   option: {
     id?: string;
@@ -167,6 +215,11 @@ export const svg = <Message>(
   children: childrenElementList(children),
 });
 
+/**
+ * ```html
+ * <path>
+ * ```
+ */
 export const path = <Message>(option: {
   id?: string;
   style?: CSSObject;
@@ -191,6 +244,11 @@ type SvgAnimation = {
   to: number | string;
 };
 
+/**
+ * ```html
+ * <circle>
+ * ```
+ */
 export const circle = <Message>(option: {
   id?: string;
   style?: CSSObject;
@@ -222,6 +280,11 @@ export const circle = <Message>(option: {
         ),
 });
 
+/**
+ * ```html
+ * <animate>
+ * ```
+ */
 const animate = (svgAnimation: SvgAnimation): Element<never> => ({
   tag: "animate",
   attributeName: svgAnimation.attributeName,
