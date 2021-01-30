@@ -17,11 +17,9 @@ jobs:
       - name: Install npm dependencies (npm ci)
         run: npm ci
       - name: npm test (using jest)
-        run: npx jest --verbose false
+        run: npx jest
       - name: Transpile TypeScript Source (npx tsc)
-        run: npx tsc --project source/tsconfig.json
-      - name: Transpile TypeScript Schema (npx tsc)
-        run: npx tsc --project schema/tsconfig.json
+        run: npx tsc --project tsconfig.json
       - name: npm publish
         id: publish
         uses: JS-DevTools/npm-publish@v1
