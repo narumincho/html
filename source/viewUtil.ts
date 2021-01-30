@@ -234,23 +234,12 @@ const animate = (svgAnimation: SvgAnimation): Element<never> => ({
 const idOrUndefined = (idValue: string | undefined): string =>
   idValue === undefined ? "" : idValue;
 
-export const view = <Message>(
-  option: {
-    readonly appName: string;
-    readonly pageName: string;
-    readonly themeColor?: Color;
-    readonly language: Language;
-    readonly style?: CSSObject;
-  },
-  children: ReadonlyMap<string, Element<Message>> | string
-): View<Message> => ({
-  pageName: option.pageName,
-  appName: option.appName,
-  themeColor: option.themeColor,
-  language: option.language,
-  bodyClass: css(option.style),
-  children: childrenFromStringOrElementMap(children),
-});
+/**
+ * view の body の class 名を スタイルから算出する.
+ *
+ * CSS も nview で管理するようになれば不要
+ */
+export const styleToBodyClass = (style?: CSSObject): string => css(style);
 
 const childrenFromStringOrElementMap = <Message>(
   children: ReadonlyMap<string, Element<Message>> | string

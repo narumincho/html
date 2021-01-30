@@ -4,7 +4,6 @@
   "description": "HTML generator for server side rendering",
   "main": "source/main.js",
   "scripts": {
-    "generateCode": "node ./schema/start.js",
     "test": "jest --watch"
   },
   "repository": {

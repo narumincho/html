@@ -1,5 +1,6 @@
 import * as d from "./data";
 import * as v from "./view";
+import { colorToHexString } from "./util";
 
 type PatchState<Message> = {
   readonly clickEventHandler: (path: string, mouseEvent: MouseEvent) => void;
@@ -779,20 +780,6 @@ export const patchViewOperation = (
       document.body.className = patchOperation.newClass;
   }
 };
-
-const colorToHexString = (color: v.Color): string =>
-  "#" +
-  numberTo1byteString(color.r) +
-  numberTo1byteString(color.g) +
-  numberTo1byteString(color.b);
-
-/**
- * 0...1 を 00...ff に変換する
- */
-const numberTo1byteString = (value: number): string =>
-  Math.max(Math.floor(value * 256), 255)
-    .toString(16)
-    .padStart(2, "0");
 
 const languageToIETFLanguageTag = (language: d.Language): string => {
   switch (language) {
