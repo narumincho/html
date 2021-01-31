@@ -625,7 +625,11 @@ export const createPatchState = <Message>(
   let messageDataMap: ReadonlyMap<string, v.Events<Message>> = new Map();
   return {
     clickEventHandler: (path: string, mouseEvent: MouseEvent): void => {
-      const messageData = messageDataMap.get(path)?.onClick;
+      const eventData = messageDataMap.get(path);
+      if (eventData === undefined) {
+        return;
+      }
+      const messageData = eventData.onClick;
       if (messageData === undefined) {
         return;
       }
@@ -651,14 +655,22 @@ export const createPatchState = <Message>(
       messageHandler(messageData.message);
     },
     changeEventHandler: (path: string, event: Event): void => {
-      const messageData = messageDataMap.get(path)?.onChange;
+      const eventData = messageDataMap.get(path);
+      if (eventData === undefined) {
+        return;
+      }
+      const messageData = eventData.onChange;
       if (messageData === undefined) {
         return;
       }
       messageHandler(messageData);
     },
     inputEventHandler: (path: string, inputEvent: InputEvent): void => {
-      const messageData = messageDataMap.get(path)?.onInput;
+      const eventData = messageDataMap.get(path);
+      if (eventData === undefined) {
+        return;
+      }
+      const messageData = eventData.onInput;
       if (messageData === undefined) {
         return;
       }
