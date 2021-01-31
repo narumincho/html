@@ -1,6 +1,6 @@
-import * as toString from "../source/toString";
-import * as view from "../source/view";
-import * as viewUtil from "../source/viewUtil";
+import * as toString from "./toString";
+import * as view from "./view";
+import * as viewUtil from "./viewUtil";
 
 describe("test", () => {
   const sampleHtml: view.View<never> = {
