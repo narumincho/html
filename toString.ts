@@ -9,6 +9,7 @@ import {
 import { Language, TwitterCard } from "./data";
 import { colorToHexString } from "./util";
 
+/** @deprecated */
 export type Attributes = {
   id?: string;
   class?: string;

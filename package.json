@@ -35,6 +35,10 @@
   "engines": {
     "node": ">=12"
   },
+  "files": [
+    "*.d.ts",
+    "*.js"
+  ],
   "jest": {
     "preset": "ts-jest"
   },
