@@ -611,6 +611,8 @@ const applyChild = <Message>(
       );
       return index + 1;
     }
+    case "skip":
+      return index + 1;
   }
 };
 

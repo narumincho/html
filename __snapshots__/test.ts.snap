@@ -19,28 +19,10 @@ exports[`diff add element 1`] = `
 Object {
   "children": Array [
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "a",
-      "kind": "update",
+      "kind": "skip",
     },
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "b",
-      "kind": "update",
+      "kind": "skip",
     },
     Object {
       "element": Object {
@@ -65,28 +47,10 @@ exports[`diff change key order 1`] = `
 Object {
   "children": Array [
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "b",
-      "kind": "update",
+      "kind": "skip",
     },
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "c",
-      "kind": "update",
+      "kind": "skip",
     },
     Object {
       "key": "a",
@@ -124,16 +88,7 @@ Object {
       "kind": "update",
     },
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "B",
-      "kind": "update",
+      "kind": "skip",
     },
     Object {
       "element": Object {
@@ -154,16 +109,7 @@ Object {
         "children": Object {
           "children": Array [
             Object {
-              "elementUpdateDiff": Object {
-                "children": Object {
-                  "kind": "skip",
-                },
-                "class": undefined,
-                "id": undefined,
-                "tag": "div",
-              },
-              "key": "text",
-              "kind": "update",
+              "kind": "skip",
             },
             Object {
               "kind": "delete",
@@ -196,16 +142,7 @@ Object {
       "kind": "insert",
     },
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "E",
-      "kind": "update",
+      "kind": "skip",
     },
     Object {
       "kind": "delete",
@@ -296,31 +233,13 @@ exports[`diff delete element 1`] = `
 Object {
   "children": Array [
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "a",
-      "kind": "update",
+      "kind": "skip",
     },
     Object {
       "kind": "delete",
     },
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "c",
-      "kind": "update",
+      "kind": "skip",
     },
   ],
   "kind": "childDiffList",
@@ -338,16 +257,7 @@ exports[`diff insert element 1`] = `
 Object {
   "children": Array [
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "a",
-      "kind": "update",
+      "kind": "skip",
     },
     Object {
       "element": Object {
@@ -364,16 +274,7 @@ Object {
       "kind": "insert",
     },
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "b",
-      "kind": "update",
+      "kind": "skip",
     },
   ],
   "kind": "childDiffList",
@@ -443,16 +344,7 @@ exports[`diff replace element 1`] = `
 Object {
   "children": Array [
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "a",
-      "kind": "update",
+      "kind": "skip",
     },
     Object {
       "kind": "delete",
@@ -472,16 +364,7 @@ Object {
       "kind": "insert",
     },
     Object {
-      "elementUpdateDiff": Object {
-        "children": Object {
-          "kind": "skip",
-        },
-        "class": undefined,
-        "id": undefined,
-        "tag": "div",
-      },
-      "key": "c",
-      "kind": "update",
+      "kind": "skip",
     },
   ],
   "kind": "childDiffList",

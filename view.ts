@@ -115,6 +115,9 @@ export type ElementDiff<Message> =
       readonly kind: "insert";
       readonly element: Element<Message>;
       readonly key: string;
+    }
+  | {
+      readonly kind: "skip";
     };
 
 export type ElementUpdateDiff<Message> =

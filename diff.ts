@@ -82,6 +82,10 @@ const update = <Message>(
   key,
 });
 
+const skip: ElementDiff<never> = {
+  kind: "skip",
+};
+
 // eslint-disable-next-line complexity
 export const createElementDiff = <Message>(
   oldElement: Element<Message>,
@@ -89,12 +93,25 @@ export const createElementDiff = <Message>(
   newKey: string
 ): ElementDiff<Message> => {
   if (oldElement.tag === "div" && newElement.tag === "div") {
+    const idDiff = createStringDiff(oldElement.id, newElement.id);
+    const classDiff = createStringDiff(oldElement.class, newElement.class);
+    const childrenDiff = createChildrenDiff(
+      oldElement.children,
+      newElement.children
+    );
+    if (
+      idDiff === undefined &&
+      classDiff === undefined &&
+      childrenDiff.kind === "skip"
+    ) {
+      return skip;
+    }
     return update(
       {
         tag: "div",
-        id: createStringDiff(oldElement.id, newElement.id),
-        class: createStringDiff(oldElement.class, newElement.class),
-        children: createChildrenDiff(oldElement.children, newElement.children),
+        id: idDiff,
+        class: classDiff,
+        children: childrenDiff,
       },
       newKey
     );
