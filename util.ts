@@ -14,6 +14,16 @@ export const mapMapValue = <Key, Input, Output>(
   return result;
 };
 
+/**
+ * 色を色コードに変換する
+ * ```ts
+ * { r: 1, g: 1, b: 1 }
+ * ```
+ * ↓
+ * ```ts
+ * "#ffffff"
+ * ```
+ */
 export const colorToHexString = (color: Color): string =>
   "#" +
   numberTo1byteString(color.r) +
@@ -24,6 +34,6 @@ export const colorToHexString = (color: Color): string =>
  * 0...1 を 00...ff に変換する
  */
 const numberTo1byteString = (value: number): string =>
-  Math.max(Math.floor(value * 256), 255)
+  Math.max(Math.min(Math.floor(value * 256), 255), 0)
     .toString(16)
     .padStart(2, "0");

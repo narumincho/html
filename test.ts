@@ -8,6 +8,7 @@ import {
 } from "./view";
 import { createChildrenDiff, createElementDiff } from "./diff";
 import { div, styleToBodyClass } from "./viewUtil";
+import { colorToHexString } from "./util";
 
 describe("toString", () => {
   const sampleHtml: View<never> = {
@@ -208,5 +209,20 @@ describe("diff", () => {
       ])
     );
     expect(createChildrenDiff(oldChildren, newChildren)).toMatchSnapshot();
+  });
+});
+
+describe("color", () => {
+  it("white", () => {
+    expect(colorToHexString({ r: 1, g: 1, b: 1 })).toEqual("#ffffff");
+  });
+  it("black", () => {
+    expect(colorToHexString({ r: 0, g: 0, b: 0 })).toEqual("#000000");
+  });
+  it("red", () => {
+    expect(colorToHexString({ r: 1, g: 0, b: 0 })).toEqual("#ff0000");
+  });
+  it("medium", () => {
+    expect(colorToHexString({ r: 0.5, g: 0.2, b: 0.1 })).toEqual("#803319");
   });
 });
