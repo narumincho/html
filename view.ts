@@ -62,8 +62,36 @@ export type View<Message> = {
   /** body の class */
   readonly bodyClass: string;
 
+  readonly pointerMove: (pointer: Pointer) => Message;
   /** body の 子要素 */
   readonly children: Children<Message>;
+};
+
+export type Pointer = {
+  /** イベントの原因となっているポインタの一意の識別子 */
+  pointer: number;
+  /** ポインタの接触ジオメトリの幅 */
+  width: number;
+  /** ポインタの接触ジオメトリの高さ */
+  height: number;
+  /** 0 から 1 の範囲のポインタ入力の正規化された圧力。 ここで、0 と 1 は、それぞれハードウェアが検出できる最小圧力と最大圧力を表します。 */
+  pressure: number;
+  /** ポインタ入力の正規化された接線圧力（バレル圧力またはシリンダー応力（cylinder stress）とも呼ばれます）は -1 から 1 の範囲で、0 はコントロールの中立位置です。 */
+  tangentialPressure: number;
+  /** Y-Z 平面と、ポインタ（ペン/スタイラスなど）軸と Y 軸の両方を含む平面との間の平面角度（度単位、-90 から 90 の範囲）。 */
+  tiltX: number;
+  /** X-Z 平面と、ポインタ（ペン/スタイラスなど）軸と X 軸の両方を含む平面との間の平面角度（度単位、-90 から 90 の範囲）。 */
+  tiltY: number;
+  /** ポインタ（ペン/スタイラスなど）の長軸を中心とした時計回りの回転の度数（0 から 359の範囲の値）。 */
+  twist: number;
+  /** イベントの原因となったデバイスタイプ（マウス、ペン、タッチなど）を示します。 */
+  pointerType: "mouse" | "pen" | "touch" | "";
+  /** ポインタがこのポインタタイプのプライマリポインタを表すかどうかを示します。 */
+  isPrimary: boolean;
+  /** 表示領域のX座標 */
+  x: number;
+  /** 表示領域のY座標 */
+  y: number;
 };
 
 /**
