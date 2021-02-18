@@ -619,7 +619,8 @@ const applyChild = <Message>(
 const themeColorName = "theme-color";
 
 /**
- * applyViewをする前に事前に実行する必要あり
+ * イベントを受け取る関数の指定をして, ブラウザで描画する前の準備をする
+ * @param messageHandler メッセージーを受け取る関数
  */
 export const createPatchState = <Message>(
   messageHandler: (message: Message) => void
@@ -713,6 +714,8 @@ const getThemeColorMetaElement = (): HTMLMetaElement | undefined => {
 
 /**
  * すべてをリセットして再描画する. 最初に1回呼ぶと良い.
+ * @param view 見た目のデータ
+ * @param patchState `createPatchState` で作成した n-view 状態
  */
 export const renderView = <Message>(
   view: v.View<Message>,
