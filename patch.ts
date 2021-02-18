@@ -1,22 +1,14 @@
 import * as d from "./data";
 import * as v from "./view";
+import { RenderState } from "./renderState";
 import { colorToHexString } from "./util";
-
-type PatchState<Message> = {
-  readonly clickEventHandler: (path: string, mouseEvent: MouseEvent) => void;
-  readonly changeEventHandler: (path: string, event: Event) => void;
-  readonly inputEventHandler: (path: string, event: InputEvent) => void;
-  readonly setMessageDataMap: (
-    newMap: ReadonlyMap<v.Path, v.Events<Message>>
-  ) => void;
-};
 
 const svgNameSpace = "http://www.w3.org/2000/svg";
 
 const elementToHtmlOrSvgElement = <Message>(
   element: v.Element<Message>,
   path: v.Path,
-  patchState: PatchState<Message>
+  patchState: RenderState<Message>
 ): HTMLElement | SVGElement => {
   switch (element.tag) {
     case "div": {
@@ -150,7 +142,7 @@ const applyChildren = <Message>(
   htmlOrSvgElement: HTMLElement | SVGElement,
   children: v.Children<Message>,
   path: v.Path,
-  patchState: PatchState<Message>
+  renderState: RenderState<Message>
 ): void => {
   if (children.tag === v.childrenTextTag) {
     htmlOrSvgElement.textContent = children.value;
@@ -161,7 +153,7 @@ const applyChildren = <Message>(
       elementToHtmlOrSvgElement(
         child,
         v.pathAppendKey(path, childKey),
-        patchState
+        renderState
       )
     );
   }
@@ -171,7 +163,7 @@ const applyChildren = <Message>(
 const pathElement = <Message>(
   htmlOrSvgElement: HTMLElement | SVGElement,
   diff: v.ElementUpdateDiff<Message>,
-  patchState: PatchState<Message>,
+  renderState: RenderState<Message>,
   path: v.Path
 ): void => {
   switch (diff.tag) {
@@ -180,7 +172,7 @@ const pathElement = <Message>(
         console.error(htmlOrSvgElement, diff, path);
         throw new Error("expect HTMLDivElement");
       }
-      patchDiv(htmlOrSvgElement, diff, patchState, path);
+      patchDiv(htmlOrSvgElement, diff, renderState, path);
       return;
 
     case "externalLink":
@@ -189,7 +181,7 @@ const pathElement = <Message>(
         console.error(htmlOrSvgElement, diff, path);
         throw new Error("expect HTMLAnchorElement");
       }
-      patchAnchor(htmlOrSvgElement, diff, patchState, path);
+      patchAnchor(htmlOrSvgElement, diff, renderState, path);
       return;
 
     case "button":
@@ -197,7 +189,7 @@ const pathElement = <Message>(
         console.error(htmlOrSvgElement, diff, path);
         throw new Error("expect HTMLButtonElement");
       }
-      patchButton(htmlOrSvgElement, diff, patchState, path);
+      patchButton(htmlOrSvgElement, diff, renderState, path);
       return;
     case "img":
       if (!(htmlOrSvgElement instanceof HTMLImageElement)) {
@@ -232,14 +224,14 @@ const pathElement = <Message>(
         console.error(htmlOrSvgElement, diff, path);
         throw new Error("expect HTMLLabelElement");
       }
-      patchLabel(htmlOrSvgElement, diff, patchState, path);
+      patchLabel(htmlOrSvgElement, diff, renderState, path);
       return;
     case "svg":
       if (!(htmlOrSvgElement instanceof SVGSVGElement)) {
         console.error(htmlOrSvgElement, diff, path);
         throw new Error("expect SVGSVGElement");
       }
-      patchSvg(htmlOrSvgElement, diff, patchState, path);
+      patchSvg(htmlOrSvgElement, diff, renderState, path);
       return;
     case "path":
       if (!(htmlOrSvgElement instanceof SVGPathElement)) {
@@ -253,7 +245,7 @@ const pathElement = <Message>(
         console.error(htmlOrSvgElement, diff, path);
         throw new Error("expect SVGCircleElement");
       }
-      patchSvgCircle(htmlOrSvgElement, diff, patchState, path);
+      patchSvgCircle(htmlOrSvgElement, diff, renderState, path);
       return;
     case "animate":
       if (!(htmlOrSvgElement instanceof SVGAnimateElement)) {
@@ -267,7 +259,7 @@ const pathElement = <Message>(
 const patchDiv = <Message>(
   realElement: HTMLDivElement,
   diff: v.DivDiff<Message>,
-  patchState: PatchState<Message>,
+  renderState: RenderState<Message>,
   path: v.Path
 ) => {
   if (diff.id !== undefined) {
@@ -276,13 +268,13 @@ const patchDiv = <Message>(
   if (diff.class !== undefined) {
     realElement.className = diff.class;
   }
-  patchChildren(realElement, diff.children, patchState, path);
+  patchChildren(realElement, diff.children, renderState, path);
 };
 
 const patchAnchor = <Message>(
   realElement: HTMLAnchorElement,
   diff: v.ExternalLinkDiff<Message> | v.LocalLinkDiff<Message>,
-  patchState: PatchState<Message>,
+  renderState: RenderState<Message>,
   path: v.Path
 ) => {
   if (diff.id !== undefined) {
@@ -294,13 +286,13 @@ const patchAnchor = <Message>(
   if (diff.url !== undefined) {
     realElement.href = diff.url;
   }
-  patchChildren(realElement, diff.children, patchState, path);
+  patchChildren(realElement, diff.children, renderState, path);
 };
 
 const patchButton = <Message>(
   realElement: HTMLButtonElement,
   diff: v.ButtonDiff<Message>,
-  patchState: PatchState<Message>,
+  renderState: RenderState<Message>,
   path: v.Path
 ) => {
   if (diff.id !== undefined) {
@@ -309,7 +301,7 @@ const patchButton = <Message>(
   if (diff.class !== undefined) {
     realElement.className = diff.class;
   }
-  patchChildren(realElement, diff.children, patchState, path);
+  patchChildren(realElement, diff.children, renderState, path);
 };
 
 const patchImg = (realElement: HTMLImageElement, diff: v.ImgDiff) => {
@@ -384,7 +376,7 @@ const patchTextArea = (
 const patchLabel = <Message>(
   realElement: HTMLLabelElement,
   diff: v.LabelDiff<Message>,
-  patchState: PatchState<Message>,
+  renderState: RenderState<Message>,
   path: v.Path
 ): void => {
   if (diff.id !== undefined) {
@@ -396,13 +388,13 @@ const patchLabel = <Message>(
   if (diff.for !== undefined) {
     realElement.htmlFor = diff.for;
   }
-  patchChildren(realElement, diff.children, patchState, path);
+  patchChildren(realElement, diff.children, renderState, path);
 };
 
 const patchSvg = <Message>(
   realElement: SVGSVGElement,
   diff: v.SvgDiff<Message>,
-  patchState: PatchState<Message>,
+  renderState: RenderState<Message>,
   path: v.Path
 ): void => {
   if (diff.id !== undefined) {
@@ -423,7 +415,7 @@ const patchSvg = <Message>(
   if (diff.viewBoxHeight !== undefined) {
     realElement.viewBox.baseVal.height = diff.viewBoxHeight;
   }
-  patchChildren(realElement, diff.children, patchState, path);
+  patchChildren(realElement, diff.children, renderState, path);
 };
 
 const patchSvgPath = (realElement: SVGPathElement, diff: v.SvgPathDiff) => {
@@ -444,7 +436,7 @@ const patchSvgPath = (realElement: SVGPathElement, diff: v.SvgPathDiff) => {
 const patchSvgCircle = <Message>(
   realElement: SVGCircleElement,
   diff: v.SvgCircleDiff,
-  patchState: PatchState<Message>,
+  renderState: RenderState<Message>,
   path: v.Path
 ) => {
   if (diff.id !== undefined) {
@@ -462,7 +454,7 @@ const patchSvgCircle = <Message>(
   if (diff.cx !== undefined) {
     realElement.cx.baseVal.value = diff.cx;
   }
-  patchChildren(realElement, diff.children, patchState, path);
+  patchChildren(realElement, diff.children, renderState, path);
 };
 
 const patchSvgAnimate = (
@@ -489,7 +481,7 @@ const patchSvgAnimate = (
 const patchChildren = <Message>(
   htmlOrSvgElement: HTMLElement | SVGElement,
   diff: v.ChildrenDiff<Message>,
-  patchState: PatchState<Message>,
+  renderState: RenderState<Message>,
   path: v.Path
 ) => {
   switch (diff.kind) {
@@ -505,7 +497,7 @@ const patchChildren = <Message>(
           elementToHtmlOrSvgElement(
             child,
             v.pathAppendKey(path, childKey),
-            patchState
+            renderState
           )
         );
       }
@@ -513,7 +505,7 @@ const patchChildren = <Message>(
     case "childDiffList":
       diff.children.reduce<number>(
         (index, childDiff) =>
-          applyChild(htmlOrSvgElement, index, childDiff, path, patchState),
+          applyChild(htmlOrSvgElement, index, childDiff, path, renderState),
         0
       );
   }
@@ -530,16 +522,16 @@ const setId = (htmlOrSvgElement: HTMLElement | SVGElement, newId: string) => {
 const setEvents = <Message>(
   htmlOrSvgElement: HTMLElement | SVGElement,
   path: v.Path,
-  patchState: PatchState<Message>
+  renderState: RenderState<Message>
 ) => {
   htmlOrSvgElement.addEventListener("click", (mouseEvent) =>
-    patchState.clickEventHandler(path, mouseEvent as MouseEvent)
+    renderState.clickEventHandler(path, mouseEvent as MouseEvent)
   );
-  htmlOrSvgElement.addEventListener("change", (event) => {
-    patchState.changeEventHandler(path, event);
+  htmlOrSvgElement.addEventListener("change", () => {
+    renderState.changeEventHandler(path);
   });
   htmlOrSvgElement.addEventListener("input", (inputEvent) => {
-    patchState.inputEventHandler(path, inputEvent as InputEvent);
+    renderState.inputEventHandler(path, inputEvent as InputEvent);
   });
 };
 
@@ -554,7 +546,7 @@ const applyChild = <Message>(
   index: number,
   childDiff: v.ElementDiff<Message>,
   path: v.Path,
-  patchState: PatchState<Message>
+  renderState: RenderState<Message>
 ): number => {
   switch (childDiff.kind) {
     case "insert": {
@@ -565,7 +557,7 @@ const applyChild = <Message>(
             elementToHtmlOrSvgElement(
               childDiff.element,
               v.pathAppendKey(path, childDiff.key),
-              patchState
+              renderState
             )
           );
           return index + 1;
@@ -574,7 +566,7 @@ const applyChild = <Message>(
           elementToHtmlOrSvgElement(
             childDiff.element,
             v.pathAppendKey(path, childDiff.key),
-            patchState
+            renderState
           )
         );
         return index + 1;
@@ -583,7 +575,7 @@ const applyChild = <Message>(
         elementToHtmlOrSvgElement(
           childDiff.element,
           v.pathAppendKey(path, childDiff.key),
-          patchState
+          renderState
         )
       );
       return index + 1;
@@ -597,7 +589,7 @@ const applyChild = <Message>(
         elementToHtmlOrSvgElement(
           childDiff.newElement,
           v.pathAppendKey(path, childDiff.key),
-          patchState
+          renderState
         )
       );
       return index + 1;
@@ -606,7 +598,7 @@ const applyChild = <Message>(
       pathElement(
         htmlOrSvgElement.childNodes[index] as HTMLElement,
         childDiff.elementUpdateDiff,
-        patchState,
+        renderState,
         v.pathAppendKey(path, childDiff.key)
       );
       return index + 1;
@@ -617,79 +609,6 @@ const applyChild = <Message>(
 };
 
 const themeColorName = "theme-color";
-
-/**
- * イベントを受け取る関数の指定をして, ブラウザで描画する前の準備をする
- * @param messageHandler メッセージーを受け取る関数
- */
-export const createPatchState = <Message>(
-  messageHandler: (message: Message) => void
-): PatchState<Message> => {
-  let messageDataMap: ReadonlyMap<string, v.Events<Message>> = new Map();
-  return {
-    clickEventHandler: (path: string, mouseEvent: MouseEvent): void => {
-      const eventData = messageDataMap.get(path);
-      if (eventData === undefined) {
-        return;
-      }
-      const messageData = eventData.onClick;
-      if (messageData === undefined) {
-        return;
-      }
-      if (messageData.ignoreNewTab) {
-        /*
-         * リンクを
-         * Ctrlなどを押しながらクリックか,
-         * マウスの中ボタンでクリックした場合などは, ブラウザで新しいタブが開くので, ブラウザでページ推移をしない.
-         */
-        if (
-          mouseEvent.ctrlKey ||
-          mouseEvent.metaKey ||
-          mouseEvent.shiftKey ||
-          mouseEvent.button !== 0
-        ) {
-          return;
-        }
-        mouseEvent.preventDefault();
-      }
-      if (messageData.stopPropagation) {
-        mouseEvent.stopPropagation();
-      }
-      messageHandler(messageData.message);
-    },
-    changeEventHandler: (path: string, event: Event): void => {
-      const eventData = messageDataMap.get(path);
-      if (eventData === undefined) {
-        return;
-      }
-      const messageData = eventData.onChange;
-      if (messageData === undefined) {
-        return;
-      }
-      messageHandler(messageData);
-    },
-    inputEventHandler: (path: string, inputEvent: InputEvent): void => {
-      const eventData = messageDataMap.get(path);
-      if (eventData === undefined) {
-        return;
-      }
-      const messageData = eventData.onInput;
-      if (messageData === undefined) {
-        return;
-      }
-      messageHandler(
-        messageData(
-          (inputEvent.target as HTMLInputElement | HTMLTextAreaElement).value
-        )
-      );
-    },
-    setMessageDataMap: (
-      newMap: ReadonlyMap<string, v.Events<Message>>
-    ): void => {
-      messageDataMap = newMap;
-    },
-  };
-};
 
 const getOrCreateThemeColorMetaElement = (): HTMLMetaElement => {
   const themeColorMetaElementOrUndefined = getThemeColorMetaElement();
@@ -715,11 +634,11 @@ const getThemeColorMetaElement = (): HTMLMetaElement | undefined => {
 /**
  * すべてをリセットして再描画する. 最初に1回呼ぶと良い.
  * @param view 見た目のデータ
- * @param patchState `createPatchState` で作成した n-view 状態
+ * @param renderState `new RenderState(..)` で作成した n-view 状態
  */
 export const renderView = <Message>(
   view: v.View<Message>,
-  patchState: PatchState<Message>
+  renderState: RenderState<Message>
 ): void => {
   document.title = view.pageName;
   const themeColorMetaElement = getOrCreateThemeColorMetaElement();
@@ -732,6 +651,8 @@ export const renderView = <Message>(
     document.documentElement.lang = languageToIETFLanguageTag(view.language);
   }
   document.body.className = view.bodyClass;
+  addEventListener("pointermove", renderState.pointerMoveHandler);
+  addEventListener("pointerdown", renderState.pointerDownHandler);
   patchChildren(
     document.body,
     view.children.tag === v.childrenTextTag
@@ -743,26 +664,25 @@ export const renderView = <Message>(
           kind: "resetAndInsert",
           value: view.children.value,
         },
-    patchState,
+    renderState,
     v.rootPath
   );
 };
 /**
- * 指定したHTMLの中身などを差分データに合わせて変える
- * DOMのAPIを呼ぶのでブラウザでしか動かない. Node.js では動かない
- * @param themeColorMetaElement `getOrCreateThemeColorHtmlMetaElement` で得たものを使う
- * @param divOrBodyElement 中身を差分データによって変えたいHTMLの要素
+ * 指定したHTMLの中身などを差分データに合わせて変える.
+ * DOMのAPIを呼ぶのでブラウザで動く. Node.js では動かない
  * @param viewDiff 差分データ
+ * @param renderState `new RenderState(..)` で作成した n-view の 内部状態
  */
 export const patchView = <Message>(
   viewDiff: v.ViewDiff<Message>,
-  patchState: PatchState<Message>
+  renderState: RenderState<Message>
 ): void => {
-  patchState.setMessageDataMap(viewDiff.newMessageDataMap);
+  renderState.setMessageDataMap(viewDiff.newMessageData);
   for (const patchOperation of viewDiff.patchOperationList) {
     patchViewOperation(patchOperation);
   }
-  patchChildren(document.body, viewDiff.childrenDiff, patchState, v.rootPath);
+  patchChildren(document.body, viewDiff.childrenDiff, renderState, v.rootPath);
 };
 
 export const patchViewOperation = (

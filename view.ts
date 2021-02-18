@@ -62,14 +62,18 @@ export type View<Message> = {
   /** body の class */
   readonly bodyClass: string;
 
-  readonly pointerMove: (pointer: Pointer) => Message;
+  /** 表示領域内でマウスや, タッチが動いたときのメッセージ */
+  readonly pointerMove?: (pointer: Pointer) => Message;
+
+  /** 表示領域内でマウスがクリックされたり, 画面に接触したときのメッセージ */
+  readonly pointerDown?: (pointer: Pointer) => Message;
   /** body の 子要素 */
   readonly children: Children<Message>;
 };
 
 export type Pointer = {
   /** イベントの原因となっているポインタの一意の識別子 */
-  pointer: number;
+  pointerId: number;
   /** ポインタの接触ジオメトリの幅 */
   width: number;
   /** ポインタの接触ジオメトリの高さ */
@@ -85,7 +89,7 @@ export type Pointer = {
   /** ポインタ（ペン/スタイラスなど）の長軸を中心とした時計回りの回転の度数（0 から 359の範囲の値）。 */
   twist: number;
   /** イベントの原因となったデバイスタイプ（マウス、ペン、タッチなど）を示します。 */
-  pointerType: "mouse" | "pen" | "touch" | "";
+  pointerType: PointerType;
   /** ポインタがこのポインタタイプのプライマリポインタを表すかどうかを示します。 */
   isPrimary: boolean;
   /** 表示領域のX座標 */
@@ -94,6 +98,15 @@ export type Pointer = {
   y: number;
 };
 
+/** ポインターの種類 */
+export type PointerType = "mouse" | "pen" | "touch" | "";
+
+/** メッセージを集計した結果 */
+export type MessageData<Message> = {
+  readonly messageMap: ReadonlyMap<string, Events<Message>>;
+  readonly pointerMove: ((pointer: Pointer) => Message) | undefined;
+  readonly pointerDown: ((pointer: Pointer) => Message) | undefined;
+};
 /**
  * View の 差分データ.
  * イベント関係は差分を使って処理をしないので Message は含まれないが, 要素を追加するときに Message を使う形になってしまっている
@@ -101,7 +114,7 @@ export type Pointer = {
 export type ViewDiff<Message> = {
   readonly patchOperationList: ReadonlyArray<ViewPatchOperation>;
   readonly childrenDiff: ChildrenDiff<Message>;
-  readonly newMessageDataMap: ReadonlyMap<Path, Events<Message>>;
+  readonly newMessageData: MessageData<Message>;
 };
 
 export type ViewPatchOperation =
