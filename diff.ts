@@ -48,7 +48,11 @@ export const createViewDiff = <Message>(
   return {
     patchOperationList: newPatchOperationList,
     childrenDiff: createChildrenDiff(oldView.children, newView.children),
-    newMessageDataMap: createMessageDataMap(newView.children),
+    newMessageData: {
+      messageMap: createMessageDataMap(newView.children),
+      pointerMove: newView.pointerMove,
+      pointerDown: newView.pointerDown,
+    },
   };
 };
 

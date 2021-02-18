@@ -62,10 +62,51 @@ export type View<Message> = {
   /** body の class */
   readonly bodyClass: string;
 
+  /** 表示領域内でマウスや, タッチが動いたときのメッセージ */
+  readonly pointerMove?: (pointer: Pointer) => Message;
+
+  /** 表示領域内でマウスがクリックされたり, 画面に接触したときのメッセージ */
+  readonly pointerDown?: (pointer: Pointer) => Message;
   /** body の 子要素 */
   readonly children: Children<Message>;
 };
 
+export type Pointer = {
+  /** イベントの原因となっているポインタの一意の識別子 */
+  pointerId: number;
+  /** ポインタの接触ジオメトリの幅 */
+  width: number;
+  /** ポインタの接触ジオメトリの高さ */
+  height: number;
+  /** 0 から 1 の範囲のポインタ入力の正規化された圧力。 ここで、0 と 1 は、それぞれハードウェアが検出できる最小圧力と最大圧力を表します。 */
+  pressure: number;
+  /** ポインタ入力の正規化された接線圧力（バレル圧力またはシリンダー応力（cylinder stress）とも呼ばれます）は -1 から 1 の範囲で、0 はコントロールの中立位置です。 */
+  tangentialPressure: number;
+  /** Y-Z 平面と、ポインタ（ペン/スタイラスなど）軸と Y 軸の両方を含む平面との間の平面角度（度単位、-90 から 90 の範囲）。 */
+  tiltX: number;
+  /** X-Z 平面と、ポインタ（ペン/スタイラスなど）軸と X 軸の両方を含む平面との間の平面角度（度単位、-90 から 90 の範囲）。 */
+  tiltY: number;
+  /** ポインタ（ペン/スタイラスなど）の長軸を中心とした時計回りの回転の度数（0 から 359の範囲の値）。 */
+  twist: number;
+  /** イベントの原因となったデバイスタイプ（マウス、ペン、タッチなど）を示します。 */
+  pointerType: PointerType;
+  /** ポインタがこのポインタタイプのプライマリポインタを表すかどうかを示します。 */
+  isPrimary: boolean;
+  /** 表示領域のX座標 */
+  x: number;
+  /** 表示領域のY座標 */
+  y: number;
+};
+
+/** ポインターの種類 */
+export type PointerType = "mouse" | "pen" | "touch" | "";
+
+/** メッセージを集計した結果 */
+export type MessageData<Message> = {
+  readonly messageMap: ReadonlyMap<string, Events<Message>>;
+  readonly pointerMove: ((pointer: Pointer) => Message) | undefined;
+  readonly pointerDown: ((pointer: Pointer) => Message) | undefined;
+};
 /**
  * View の 差分データ.
  * イベント関係は差分を使って処理をしないので Message は含まれないが, 要素を追加するときに Message を使う形になってしまっている
@@ -73,7 +114,7 @@ export type View<Message> = {
 export type ViewDiff<Message> = {
   readonly patchOperationList: ReadonlyArray<ViewPatchOperation>;
   readonly childrenDiff: ChildrenDiff<Message>;
-  readonly newMessageDataMap: ReadonlyMap<Path, Events<Message>>;
+  readonly newMessageData: MessageData<Message>;
 };
 
 export type ViewPatchOperation =

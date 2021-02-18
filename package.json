@@ -186,6 +186,7 @@
     "url": "git+https://github.com/narumincho/html.git"
   },
   "scripts": {
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "typeCheck": "tsc --noEmit"
   }
 }
