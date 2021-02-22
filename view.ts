@@ -51,13 +51,16 @@ export type View<Message> = {
   readonly style?: string;
 
   /** スタイルのURL */
-  readonly styleUrlList: ReadonlyArray<URL>;
+  readonly styleUrlList?: ReadonlyArray<URL>;
 
   /** ES Modules形式のJavaScript */
   readonly script?: string;
 
-  /** スクリプトのURL */
-  readonly scriptUrlList: ReadonlyArray<URL>;
+  /** メインのスクリプトのパス */
+  readonly scriptPath?: string;
+
+  /** スクリプトのURL. 違うオリジンのスクリプトを含めたいときに使う */
+  readonly scriptUrlList?: ReadonlyArray<URL>;
 
   /** body の class */
   readonly bodyClass: string;

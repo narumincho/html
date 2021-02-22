@@ -453,30 +453,55 @@ const elementToRawElement = <Message>(
   }
 };
 
-const headElement = <Message>(html: View<Message>): RawElement =>
-  rawElement("head", new Map(), [
+const headElement = <Message>(view: View<Message>): RawElement => {
+  const children: Array<RawElement> = [
     charsetElement,
     viewportElement,
-    pageNameElement(html.pageName),
-    descriptionElement(html.description),
-    ...(html.themeColor === undefined
-      ? []
-      : [themeColorElement(html.themeColor)]),
-    iconElement(html.iconPath),
-    ...(html.manifestPath === undefined
-      ? []
-      : [manifestElement(html.manifestPath)]),
-    ...(html.style === undefined ? [] : [cssStyleElement(html.style)]),
-    twitterCardElement(html.twitterCard),
-    ogUrlElement(html.url),
-    ogTitleElement(html.pageName),
-    ogSiteName(html.appName),
-    ogDescription(html.description),
-    ogImage(html.coverImageUrl),
-    ...(html.script === undefined ? [] : [javaScriptElement(html.script)]),
-    ...html.scriptUrlList.map(javaScriptElementByUrl),
-    ...html.styleUrlList.map(styleElementByUrl),
-  ]);
+    pageNameElement(view.pageName),
+    descriptionElement(view.description),
+  ];
+  if (view.themeColor !== undefined) {
+    children.push(themeColorElement(view.themeColor));
+  }
+  children.push(iconElement(view.iconPath));
+  if (view.manifestPath !== undefined) {
+    children.push(manifestElement(view.manifestPath));
+  }
+  if (typeof view.style === "string") {
+    children.push(cssStyleElement(view.style));
+  }
+  children.push(twitterCardElement(view.twitterCard));
+  children.push(ogUrlElement(view.url));
+  children.push(ogTitleElement(view.pageName));
+  children.push(ogSiteName(view.appName));
+  children.push(ogDescription(view.description));
+  children.push(ogImage(view.coverImageUrl));
+  if (typeof view.script === "string") {
+    children.push(javaScriptElement(view.script));
+  }
+  if (typeof view.scriptPath === "string") {
+    children.push(javaScriptElementByPath(view.scriptPath));
+  }
+  if (view.scriptUrlList !== undefined) {
+    for (const scriptUrl of view.scriptUrlList) {
+      children.push(javaScriptElementByUrl(scriptUrl));
+    }
+  }
+  if (view.styleUrlList !== undefined) {
+    for (const styleUrl of view.styleUrlList) {
+      children.push(styleElementByUrl(styleUrl));
+    }
+  }
+
+  return {
+    name: "head",
+    attributes: new Map(),
+    children: {
+      tag: "HtmlElementList",
+      value: children,
+    },
+  };
+};
 
 const charsetElement: RawElement = rawElementNoEndTag(
   "meta",
@@ -589,6 +614,15 @@ const ogImage = (url: URL): RawElement =>
 
 const javaScriptElement = (javaScriptCode: string): RawElement =>
   rawElementRawText("script", new Map([["type", "module"]]), javaScriptCode);
+
+const javaScriptElementByPath = (path: string): RawElement => ({
+  name: "script",
+  attributes: new Map([
+    ["defer", null],
+    ["src", path],
+  ]),
+  children: { tag: "Text", text: "" },
+});
 
 const javaScriptElementByUrl = (url: URL): RawElement =>
   rawElement(
