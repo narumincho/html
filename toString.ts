@@ -10,14 +10,14 @@ import {
   htmlOption,
 } from "./htmlOption";
 
-/** @deprecated */
-export type Attributes = {
+/** 多くのHTMLElementに指定できる属性 */
+export type CommonAttributes = {
   id?: string;
   class?: string;
 };
 
 const attributesToMap = (
-  attributes: Attributes
+  attributes: CommonAttributes
 ): ReadonlyMap<string, string | null> => {
   const attributeMap: Map<string, string | null> = new Map();
   if (attributes.id !== undefined) {
@@ -34,46 +34,46 @@ const attributesToMap = (
  * @deprecated
  */
 export const h1 = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => rawElement("h1", attributesToMap(attributes), children);
+  attributes: CommonAttributes,
+  children: ReadonlyArray<HtmlElement> | string
+): HtmlElement => htmlElement("h1", attributesToMap(attributes), children);
 
 /**
  * 見出し
  * @deprecated
  */
 export const h2 = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => rawElement("h2", attributesToMap(attributes), children);
+  attributes: CommonAttributes,
+  children: ReadonlyArray<HtmlElement> | string
+): HtmlElement => htmlElement("h2", attributesToMap(attributes), children);
 
 /**
  * 見出し
  * @deprecated
  */
 export const h3 = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => rawElement("h3", attributesToMap(attributes), children);
+  attributes: CommonAttributes,
+  children: ReadonlyArray<HtmlElement> | string
+): HtmlElement => htmlElement("h3", attributesToMap(attributes), children);
 
 /**
  * 区切り
  * @deprecated
  */
 export const section = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement>
-): RawElement => rawElement("section", attributesToMap(attributes), children);
+  attributes: CommonAttributes,
+  children: ReadonlyArray<HtmlElement>
+): HtmlElement => htmlElement("section", attributesToMap(attributes), children);
 
 /**
  * 引用
  * @deprecated
  */
 export const quote = (
-  attributes: Attributes & { cite?: URL },
-  children: ReadonlyArray<RawElement> | string
-): RawElement =>
-  rawElement(
+  attributes: CommonAttributes & { cite?: URL },
+  children: ReadonlyArray<HtmlElement> | string
+): HtmlElement =>
+  htmlElement(
     "quote",
     attributes.cite === undefined
       ? attributesToMap(attributes)
@@ -89,22 +89,22 @@ export const quote = (
  * @deprecated
  */
 export const code = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => rawElement("code", attributesToMap(attributes), children);
+  attributes: CommonAttributes,
+  children: ReadonlyArray<HtmlElement> | string
+): HtmlElement => htmlElement("code", attributesToMap(attributes), children);
 
 /**
  * @narumincho/htmlにないHTML要素を使いたいときに使うもの。
- * 低レベルAPI @deprecated
+ * 低レベルAPI
  * @param name 要素名
  * @param attributes 属性
  * @param children 子要素
  */
-const rawElement = (
+const htmlElement = (
   name: string,
   attributes: ReadonlyMap<string, string | null>,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => ({
+  children: ReadonlyArray<HtmlElement> | string
+): HtmlElement => ({
   name,
   attributes,
   children:
@@ -129,11 +129,11 @@ const rawElement = (
  * @param attributes 属性
  * @param text エスケープしないテキスト
  */
-const rawElementRawText = (
+const htmlElementRawText = (
   name: string,
   attributes: ReadonlyMap<string, string | null>,
   text: string
-): RawElement => ({
+): HtmlElement => ({
   name,
   attributes,
   children: {
@@ -148,10 +148,10 @@ const rawElementRawText = (
  * @param name 要素名
  * @param attributes 属性
  */
-export const rawElementNoEndTag = (
+const htmlElementNoEndTag = (
   name: string,
   attributes: ReadonlyMap<string, string | null>
-): RawElement => ({
+): HtmlElement => ({
   name,
   attributes,
   children: {
@@ -160,41 +160,44 @@ export const rawElementNoEndTag = (
 });
 
 /**
- * HtmlElement (need validated)
+ * HtmlElement
  */
-export type RawElement = {
-  name: string;
+export type HtmlElement = {
+  /**
+   * 要素名 `h1` や `div` など
+   */
+  readonly name: string;
   /**
    * 属性名は正しい必要がある。
    * value=nullの意味は、属性値がないということ。
    * `<button disabled>`
    */
-  attributes: ReadonlyMap<string, string | null>;
+  readonly attributes: ReadonlyMap<string, string | null>;
   /**
-   * 子供。
+   * 子の要素
    * `<path d="M1,2 L20,53"/>`のような閉じカッコの省略はしない
    */
-  children: RawChildren;
+  readonly children: HtmlChildren;
 };
 
 /**
  * 子要素のパターン。パターンマッチングのみに使う
  */
-export type RawChildren =
+export type HtmlChildren =
   | {
-      tag: "HtmlElementList";
-      value: ReadonlyArray<RawElement>;
+      readonly tag: "HtmlElementList";
+      readonly value: ReadonlyArray<HtmlElement>;
     }
   | {
-      tag: "Text";
-      text: string;
+      readonly tag: "Text";
+      readonly text: string;
     }
   | {
-      tag: "RawText";
-      text: string;
+      readonly tag: "RawText";
+      readonly text: string;
     }
   | {
-      tag: "NoEndTag";
+      readonly tag: "NoEndTag";
     };
 
 export const escapeInHtml = (text: string): string =>
@@ -259,9 +262,9 @@ export const toString = (view: htmlOption): string =>
 
 const appendNoScriptDescription = (
   appName: string,
-  rawChildren: RawChildren
-): RawChildren => {
-  const noScriptElement: RawElement = {
+  rawChildren: HtmlChildren
+): HtmlChildren => {
+  const noScriptElement: HtmlElement = {
     name: "noscript",
     attributes: new Map(),
     children: {
@@ -294,7 +297,7 @@ const appendNoScriptDescription = (
   }
 };
 
-const childrenToRawChildren = (children: Children): RawChildren => {
+const childrenToRawChildren = (children: Children): HtmlChildren => {
   switch (children.tag) {
     case childrenElementListTag:
       return {
@@ -308,7 +311,7 @@ const childrenToRawChildren = (children: Children): RawChildren => {
   }
 };
 
-const elementToRawElement = (element: Element): RawElement => {
+const elementToRawElement = (element: Element): HtmlElement => {
   switch (element.tag) {
     case "animate":
       return {
@@ -443,8 +446,8 @@ const elementToRawElement = (element: Element): RawElement => {
   }
 };
 
-const headElement = (view: htmlOption): RawElement => {
-  const children: Array<RawElement> = [
+const headElement = (view: htmlOption): HtmlElement => {
+  const children: Array<HtmlElement> = [
     charsetElement,
     viewportElement,
     pageNameElement(view.pageName),
@@ -487,12 +490,12 @@ const headElement = (view: htmlOption): RawElement => {
   };
 };
 
-const charsetElement: RawElement = rawElementNoEndTag(
+const charsetElement: HtmlElement = htmlElementNoEndTag(
   "meta",
   new Map([["charset", "utf-8"]])
 );
 
-const viewportElement: RawElement = rawElementNoEndTag(
+const viewportElement: HtmlElement = htmlElementNoEndTag(
   "meta",
   new Map([
     ["name", "viewport"],
@@ -500,11 +503,11 @@ const viewportElement: RawElement = rawElementNoEndTag(
   ])
 );
 
-const pageNameElement = (pageName: string): RawElement =>
-  rawElement("title", new Map(), pageName);
+const pageNameElement = (pageName: string): HtmlElement =>
+  htmlElement("title", new Map(), pageName);
 
-const descriptionElement = (description: string): RawElement =>
-  rawElementNoEndTag(
+const descriptionElement = (description: string): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["name", "description"],
@@ -512,8 +515,8 @@ const descriptionElement = (description: string): RawElement =>
     ])
   );
 
-const themeColorElement = (themeColor: Color): RawElement =>
-  rawElementNoEndTag(
+const themeColorElement = (themeColor: Color): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["name", "theme-color"],
@@ -521,8 +524,8 @@ const themeColorElement = (themeColor: Color): RawElement =>
     ])
   );
 
-const iconElement = (iconUrl: URL): RawElement =>
-  rawElementNoEndTag(
+const iconElement = (iconUrl: URL): HtmlElement =>
+  htmlElementNoEndTag(
     "link",
     new Map([
       ["rel", "icon"],
@@ -530,11 +533,11 @@ const iconElement = (iconUrl: URL): RawElement =>
     ])
   );
 
-const cssStyleElement = (cssCode: string): RawElement =>
-  rawElementRawText("style", new Map(), cssCode);
+const cssStyleElement = (cssCode: string): HtmlElement =>
+  htmlElementRawText("style", new Map(), cssCode);
 
-const twitterCardElement = (twitterCard: TwitterCard): RawElement =>
-  rawElementNoEndTag(
+const twitterCardElement = (twitterCard: TwitterCard): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["name", "twitter:card"],
@@ -542,8 +545,8 @@ const twitterCardElement = (twitterCard: TwitterCard): RawElement =>
     ])
   );
 
-const ogUrlElement = (url: URL): RawElement =>
-  rawElementNoEndTag(
+const ogUrlElement = (url: URL): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["property", "og:url"],
@@ -551,8 +554,8 @@ const ogUrlElement = (url: URL): RawElement =>
     ])
   );
 
-const ogTitleElement = (title: string): RawElement =>
-  rawElementNoEndTag(
+const ogTitleElement = (title: string): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["property", "og:title"],
@@ -560,8 +563,8 @@ const ogTitleElement = (title: string): RawElement =>
     ])
   );
 
-const ogSiteName = (siteName: string): RawElement =>
-  rawElementNoEndTag(
+const ogSiteName = (siteName: string): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["property", "og:site_name"],
@@ -569,8 +572,8 @@ const ogSiteName = (siteName: string): RawElement =>
     ])
   );
 
-const ogDescription = (description: string): RawElement =>
-  rawElementNoEndTag(
+const ogDescription = (description: string): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["property", "og:description"],
@@ -578,8 +581,8 @@ const ogDescription = (description: string): RawElement =>
     ])
   );
 
-const ogImage = (url: URL): RawElement =>
-  rawElementNoEndTag(
+const ogImage = (url: URL): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["property", "og:image"],
@@ -587,20 +590,11 @@ const ogImage = (url: URL): RawElement =>
     ])
   );
 
-const javaScriptElement = (javaScriptCode: string): RawElement =>
-  rawElementRawText("script", new Map([["type", "module"]]), javaScriptCode);
+const javaScriptElement = (javaScriptCode: string): HtmlElement =>
+  htmlElementRawText("script", new Map([["type", "module"]]), javaScriptCode);
 
-const javaScriptElementByPath = (path: string): RawElement => ({
-  name: "script",
-  attributes: new Map([
-    ["defer", null],
-    ["src", path],
-  ]),
-  children: { tag: "Text", text: "" },
-});
-
-const javaScriptElementByUrl = (url: URL): RawElement =>
-  rawElement(
+const javaScriptElementByUrl = (url: URL): HtmlElement =>
+  htmlElement(
     "script",
     new Map([
       ["defer", null],
@@ -609,8 +603,8 @@ const javaScriptElementByUrl = (url: URL): RawElement =>
     []
   );
 
-const styleElementByUrl = (url: URL): RawElement =>
-  rawElementNoEndTag(
+const styleElementByUrl = (url: URL): HtmlElement =>
+  htmlElementNoEndTag(
     "link",
     new Map([
       ["rel", "stylesheet"],
@@ -618,27 +612,21 @@ const styleElementByUrl = (url: URL): RawElement =>
     ])
   );
 
-const escapeUrl = (text: string): string =>
-  encodeURIComponent(text).replace(
-    /[!'()*]/gu,
-    (c: string) => "%" + c.charCodeAt(0).toString(16)
-  );
-
-const htmlElementToString = (htmlElement: RawElement): string => {
+const htmlElementToString = (element: HtmlElement): string => {
   const startTag =
-    "<" + htmlElement.name + attributesToString(htmlElement.attributes) + ">";
-  const endTag = "</" + htmlElement.name + ">";
-  switch (htmlElement.children.tag) {
+    "<" + element.name + attributesToString(element.attributes) + ">";
+  const endTag = "</" + element.name + ">";
+  switch (element.children.tag) {
     case "HtmlElementList":
       return (
         startTag +
-        htmlElement.children.value.map(htmlElementToString).join("") +
+        element.children.value.map(htmlElementToString).join("") +
         endTag
       );
     case "Text":
-      return startTag + escapeInHtml(htmlElement.children.text) + endTag;
+      return startTag + escapeInHtml(element.children.text) + endTag;
     case "RawText":
-      return startTag + htmlElement.children.text + endTag;
+      return startTag + element.children.text + endTag;
     case "NoEndTag":
       return startTag;
   }
