@@ -30,8 +30,7 @@ const attributesToMap = (
 };
 
 /**
- * 見出し
- * @deprecated
+ * ページの見出し
  */
 export const h1 = (
   attributes: CommonAttributes,
@@ -40,7 +39,6 @@ export const h1 = (
 
 /**
  * 見出し
- * @deprecated
  */
 export const h2 = (
   attributes: CommonAttributes,
@@ -49,49 +47,11 @@ export const h2 = (
 
 /**
  * 見出し
- * @deprecated
  */
 export const h3 = (
   attributes: CommonAttributes,
   children: ReadonlyArray<HtmlElement> | string
 ): HtmlElement => htmlElement("h3", attributesToMap(attributes), children);
-
-/**
- * 区切り
- * @deprecated
- */
-export const section = (
-  attributes: CommonAttributes,
-  children: ReadonlyArray<HtmlElement>
-): HtmlElement => htmlElement("section", attributesToMap(attributes), children);
-
-/**
- * 引用
- * @deprecated
- */
-export const quote = (
-  attributes: CommonAttributes & { cite?: URL },
-  children: ReadonlyArray<HtmlElement> | string
-): HtmlElement =>
-  htmlElement(
-    "quote",
-    attributes.cite === undefined
-      ? attributesToMap(attributes)
-      : new Map([
-          ...attributesToMap(attributes),
-          ["cite", attributes.cite.toString()],
-        ]),
-    children
-  );
-
-/**
- * プログラムのコード
- * @deprecated
- */
-export const code = (
-  attributes: CommonAttributes,
-  children: ReadonlyArray<HtmlElement> | string
-): HtmlElement => htmlElement("code", attributesToMap(attributes), children);
 
 /**
  * @narumincho/htmlにないHTML要素を使いたいときに使うもの。
@@ -264,16 +224,12 @@ const appendNoScriptDescription = (
   appName: string,
   rawChildren: HtmlChildren
 ): HtmlChildren => {
-  const noScriptElement: HtmlElement = {
-    name: "noscript",
-    attributes: new Map(),
-    children: {
-      tag: "Text",
-      text:
-        appName +
-        "ではJavaScriptを使用します。ブラウザの設定で有効にしてください。",
-    },
-  };
+  const noScriptElement: HtmlElement = htmlElement(
+    "noscript",
+    new Map(),
+    appName +
+      " では JavaScript を使用します. ブラウザの設定で有効にしてください."
+  );
   switch (rawChildren.tag) {
     case "HtmlElementList":
       return {
