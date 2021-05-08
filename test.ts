@@ -4,11 +4,11 @@ import { div, styleToBodyClass } from "./viewUtil";
 import { colorToHexString } from "./util";
 
 describe("toString", () => {
-  const sampleHtml: View<never> = {
+  const sampleHtml: View = {
     appName: "テストアプリ",
     pageName: "テストページ",
     language: "Japanese",
-    iconPath: "/icon",
+    iconUrl: new URL("https://narumincho.com/assets/kamausagi.png"),
     coverImageUrl: new URL("https://narumincho.com/assets/kamausagi.png"),
     description: "ページの説明",
     twitterCard: "SummaryCard",

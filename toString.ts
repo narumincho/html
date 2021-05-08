@@ -228,7 +228,7 @@ const twitterCardToString = (twitterCard: TwitterCard): string => {
 /**
  * View を HTML に変換する. イベントの登録は行われない
  */
-export const toString = <Message>(view: View<Message>): string =>
+export const toString = (view: View): string =>
   "<!doctype html>" +
   htmlElementToString({
     name: "html",
@@ -243,7 +243,10 @@ export const toString = <Message>(view: View<Message>): string =>
         headElement(view),
         {
           name: "body",
-          attributes: new Map([["class", view.bodyClass]]),
+          attributes:
+            view.bodyClass === undefined
+              ? new Map()
+              : new Map([["class", view.bodyClass]]),
           children: appendNoScriptDescription(
             view.appName,
             childrenToRawChildren(view.children)
@@ -290,9 +293,7 @@ const appendNoScriptDescription = (
   }
 };
 
-const childrenToRawChildren = <Message>(
-  children: Children<Message>
-): RawChildren => {
+const childrenToRawChildren = (children: Children): RawChildren => {
   switch (children.tag) {
     case childrenElementListTag:
       return {
@@ -306,9 +307,7 @@ const childrenToRawChildren = <Message>(
   }
 };
 
-const elementToRawElement = <Message>(
-  element: Element<Message>
-): RawElement => {
+const elementToRawElement = (element: Element): RawElement => {
   switch (element.tag) {
     case "animate":
       return {
@@ -355,7 +354,7 @@ const elementToRawElement = <Message>(
         ]),
         children: childrenToRawChildren(element.children),
       };
-    case "externalLink":
+    case "anchor":
       return {
         name: "a",
         attributes: new Map([
@@ -407,16 +406,6 @@ const elementToRawElement = <Message>(
         ]),
         children: childrenToRawChildren(element.children),
       };
-    case "localLink":
-      return {
-        name: "a",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-          ["href", element.url],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
     case "path":
       return {
         name: "path",
@@ -453,7 +442,7 @@ const elementToRawElement = <Message>(
   }
 };
 
-const headElement = <Message>(view: View<Message>): RawElement => {
+const headElement = (view: View): RawElement => {
   const children: Array<RawElement> = [
     charsetElement,
     viewportElement,
@@ -463,10 +452,7 @@ const headElement = <Message>(view: View<Message>): RawElement => {
   if (view.themeColor !== undefined) {
     children.push(themeColorElement(view.themeColor));
   }
-  children.push(iconElement(view.iconPath));
-  if (view.manifestPath !== undefined) {
-    children.push(manifestElement(view.manifestPath));
-  }
+  children.push(iconElement(view.iconUrl));
   if (typeof view.style === "string") {
     children.push(cssStyleElement(view.style));
   }
@@ -537,21 +523,12 @@ const themeColorElement = (themeColor: Color): RawElement =>
     ])
   );
 
-const iconElement = (iconPath: string): RawElement =>
+const iconElement = (iconUrl: URL): RawElement =>
   rawElementNoEndTag(
     "link",
     new Map([
       ["rel", "icon"],
-      ["href", iconPath],
-    ])
-  );
-
-const manifestElement = (path: ReadonlyArray<string>): RawElement =>
-  rawElementNoEndTag(
-    "link",
-    new Map([
-      ["rel", "manifest"],
-      ["href", "/" + path.map(escapeUrl).join("/")],
+      ["href", iconUrl.toString()],
     ])
   );
 

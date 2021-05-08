@@ -1,39 +1,21 @@
 import { CSSObject, css } from "@emotion/css";
-import {
-  Children,
-  ClickMessageData,
-  Element,
-  childrenElementList,
-  childrenElementListTag,
-  childrenText,
-  childrenTextTag,
-} from "./view";
-import { mapMapValue } from "./util";
+import { Children, Element, childrenElementList, childrenText } from "./view";
 
 /**
  * ```html
  * <div>
  * ```
  */
-export const div = <Message>(
+export const div = (
   option: {
     id?: string;
-    click?: { stopPropagation: boolean; message: Message };
     style?: CSSObject;
   },
-  children: ReadonlyMap<string, Element<Message>> | string
-): Element<Message> => ({
+  children: ReadonlyMap<string, Element> | string
+): Element => ({
   tag: "div",
   id: idOrUndefined(option.id),
   class: css(option.style),
-  click:
-    option.click === undefined
-      ? null
-      : {
-          stopPropagation: option.click.stopPropagation,
-          message: option.click.message,
-          ignoreNewTab: false,
-        },
   children: childrenFromStringOrElementMap(children),
 });
 
@@ -42,41 +24,18 @@ export const div = <Message>(
  * <a href="URL">
  * ```
  */
-export const externalLink = <Message>(
+export const anchor = (
   option: {
     id?: string;
     url: URL;
     style?: CSSObject;
   },
-  children: ReadonlyMap<string, Element<Message>> | string
-): Element<Message> => ({
-  tag: "externalLink",
+  children: ReadonlyMap<string, Element> | string
+): Element => ({
+  tag: "anchor",
   id: idOrUndefined(option.id),
   class: css(option.style),
   url: option.url.toString(),
-  children: childrenFromStringOrElementMap(children),
-});
-
-/**
- * ```html
- * <a href="URL">
- * ```
- * `externalLink` とは違い, jumpMessage の発火を優先し, 新しいタブを開くような動作をしたら 通常の `<a>` と同じ動きをする
- */
-export const localLink = <Message>(
-  option: {
-    id?: string;
-    url: URL;
-    style?: CSSObject;
-    jumpMessage: Message;
-  },
-  children: ReadonlyMap<string, Element<Message>> | string
-): Element<Message> => ({
-  tag: "localLink",
-  id: idOrUndefined(option.id),
-  class: css(option.style),
-  url: option.url.toString(),
-  jumpMessage: option.jumpMessage,
   children: childrenFromStringOrElementMap(children),
 });
 
@@ -85,18 +44,16 @@ export const localLink = <Message>(
  * <button>
  * ```
  */
-export const button = <Message>(
+export const button = (
   option: {
     id?: string;
     style?: CSSObject;
-    click: Message;
   },
-  children: ReadonlyMap<string, Element<Message>> | string
-): Element<Message> => ({
+  children: ReadonlyMap<string, Element> | string
+): Element => ({
   tag: "button",
   id: idOrUndefined(option.id),
   class: css(option.style),
-  click: option.click,
   children: childrenFromStringOrElementMap(children),
 });
 
@@ -105,13 +62,13 @@ export const button = <Message>(
  * <img alt="画像の代替テキスト" src="URL か blob URL">
  * ```
  */
-export const image = <Message>(option: {
+export const image = (option: {
   id?: string;
   style?: CSSObject;
   alt: string;
   /** 画像のURL. なぜ URL 型にしないかと言うと, BlobURLがURL型に入らないから */
   src: string;
-}): Element<Message> => ({
+}): Element => ({
   tag: "img",
   id: idOrUndefined(option.id),
   class: css(option.style),
@@ -124,20 +81,18 @@ export const image = <Message>(option: {
  * <input type="radio">
  * ```
  */
-export const inputRadio = <Message>(option: {
+export const inputRadio = (option: {
   id?: string;
   style?: CSSObject;
-  select: Message;
   checked: boolean;
   /** 選択肢の選択を1にする動作のため. どの選択肢に属しているかを指定する */
   groupName: string;
-}): Element<Message> => ({
+}): Element => ({
   tag: "inputRadio",
   id: idOrUndefined(option.id),
   class: css(option.style),
   checked: option.checked,
   name: option.groupName,
-  select: option.select,
 });
 
 /**
@@ -145,17 +100,15 @@ export const inputRadio = <Message>(option: {
  * <input type="text">
  * ```
  */
-export const inputOneLineText = <Message>(option: {
+export const inputOneLineText = (option: {
   id?: string;
   style?: CSSObject;
-  inputOrReadonly: ((text: string) => Message) | null;
   value: string;
-}): Element<Message> => ({
+}): Element => ({
   tag: "inputText",
   id: idOrUndefined(option.id),
   class: css(option.style),
   value: option.value,
-  inputOrReadonly: option.inputOrReadonly,
 });
 
 /**
@@ -163,17 +116,15 @@ export const inputOneLineText = <Message>(option: {
  * <textarea>
  * ```
  */
-export const inputMultiLineText = <Message>(option: {
+export const inputMultiLineText = (option: {
   id?: string;
   style?: CSSObject;
-  inputOrReadonly: ((text: string) => Message) | null;
   value: string;
-}): Element<Message> => ({
+}): Element => ({
   tag: "textArea",
   id: idOrUndefined(option.id),
   class: css(option.style),
   value: option.value,
-  inputOrReadonly: option.inputOrReadonly,
 });
 
 /**
@@ -183,8 +134,8 @@ export const inputMultiLineText = <Message>(option: {
  */
 export const label = (
   option: { id?: string; style?: CSSObject; targetElementId: string },
-  children: ReadonlyMap<string, Element<never>> | string
-): Element<never> => ({
+  children: ReadonlyMap<string, Element> | string
+): Element => ({
   tag: "label",
   id: idOrUndefined(option.id),
   class: css(option.style),
@@ -197,14 +148,14 @@ export const label = (
  * <svg>
  * ```
  */
-export const svg = <Message>(
+export const svg = (
   option: {
     id?: string;
     viewBox: { x: number; y: number; width: number; height: number };
     style?: CSSObject;
   },
-  children: ReadonlyMap<string, Element<Message>>
-): Element<Message> => ({
+  children: ReadonlyMap<string, Element>
+): Element => ({
   tag: "svg",
   id: idOrUndefined(option.id),
   class: css(option.style),
@@ -220,12 +171,12 @@ export const svg = <Message>(
  * <path>
  * ```
  */
-export const path = <Message>(option: {
+export const path = (option: {
   id?: string;
   style?: CSSObject;
   d: string;
   fill: string;
-}): Element<Message> => ({
+}): Element => ({
   tag: "path",
   id: idOrUndefined(option.id),
   class: css(option.style),
@@ -249,7 +200,7 @@ type SvgAnimation = {
  * <circle>
  * ```
  */
-export const circle = <Message>(option: {
+export const circle = (option: {
   id?: string;
   style?: CSSObject;
   cx: number;
@@ -258,7 +209,7 @@ export const circle = <Message>(option: {
   r: number;
   stroke: string;
   animations?: ReadonlyArray<SvgAnimation>;
-}): Element<Message> => ({
+}): Element => ({
   tag: "circle",
   id: idOrUndefined(option.id),
   class: css(option.style),
@@ -269,7 +220,7 @@ export const circle = <Message>(option: {
   stroke: option.stroke,
   children:
     option.animations === undefined
-      ? childrenText<never>("")
+      ? childrenText("")
       : childrenElementList(
           c(
             option.animations.map((animation) => [
@@ -285,7 +236,7 @@ export const circle = <Message>(option: {
  * <animate>
  * ```
  */
-const animate = (svgAnimation: SvgAnimation): Element<never> => ({
+const animate = (svgAnimation: SvgAnimation): Element => ({
   tag: "animate",
   attributeName: svgAnimation.attributeName,
   dur: svgAnimation.dur,
@@ -304,150 +255,13 @@ const idOrUndefined = (idValue: string | undefined): string =>
  */
 export const styleToBodyClass = (style?: CSSObject): string => css(style);
 
-const childrenFromStringOrElementMap = <Message>(
-  children: ReadonlyMap<string, Element<Message>> | string
-): Children<Message> =>
+const childrenFromStringOrElementMap = (
+  children: ReadonlyMap<string, Element> | string
+): Children =>
   typeof children === "string"
     ? childrenText(children)
     : childrenElementList(children);
 
-export const c = <Message>(
-  keyAndElementList: ReadonlyArray<readonly [string, Element<Message>]>
-): ReadonlyMap<string, Element<Message>> => new Map(keyAndElementList);
-
-export const fromNever = <Message>(element: Element<never>): Element<Message> =>
-  element;
-
-export const elementMap = <Input, Output>(
-  element: Element<Input>,
-  func: (input: Input) => Output
-): Element<Output> => {
-  switch (element.tag) {
-    case "div":
-      return {
-        tag: "div",
-        id: element.id,
-        class: element.class,
-        click: mapClickMessageData(element.click, func),
-        children: childrenMap(element.children, func),
-      };
-    case "externalLink":
-      return {
-        tag: "externalLink",
-        id: element.id,
-        class: element.class,
-        url: element.url,
-        children: childrenMap(element.children, func),
-      };
-    case "button":
-      return {
-        tag: "button",
-        id: element.id,
-        class: element.class,
-        click: func(element.click),
-        children: childrenMap(element.children, func),
-      };
-    case "localLink":
-      return {
-        tag: "localLink",
-        id: element.id,
-        class: element.class,
-        url: element.url,
-        jumpMessage: func(element.jumpMessage),
-        children: childrenMap(element.children, func),
-      };
-    case "img":
-      return element;
-    case "inputRadio":
-      return {
-        tag: "inputRadio",
-        id: element.id,
-        class: element.class,
-        name: element.name,
-        checked: element.checked,
-        select: func(element.select),
-      };
-    case "inputText":
-      return {
-        tag: "inputText",
-        id: element.id,
-        class: element.class,
-        value: element.value,
-        inputOrReadonly: inputOrReadonlyMap(element.inputOrReadonly, func),
-      };
-    case "textArea":
-      return {
-        tag: "textArea",
-        id: element.id,
-        class: element.class,
-        value: element.value,
-        inputOrReadonly: inputOrReadonlyMap(element.inputOrReadonly, func),
-      };
-    case "label":
-      return {
-        tag: "label",
-        id: element.id,
-        class: element.class,
-        for: element.for,
-        children: childrenMap(element.children, func),
-      };
-    case "svg":
-      return {
-        tag: "svg",
-        id: element.id,
-        class: element.class,
-        viewBoxX: element.viewBoxX,
-        viewBoxY: element.viewBoxY,
-        viewBoxWidth: element.viewBoxWidth,
-        viewBoxHeight: element.viewBoxHeight,
-        children: childrenMap(element.children, func),
-      };
-    case "path":
-      return element;
-    case "circle":
-      return element;
-    case "animate":
-      return element;
-  }
-};
-
-const inputOrReadonlyMap = <Input, Output>(
-  inputOrReadonly: ((newText: string) => Input) | null,
-  func: (input: Input) => Output
-) => {
-  if (inputOrReadonly === null) {
-    return null;
-  }
-  return (newText: string): Output => func(inputOrReadonly(newText));
-};
-
-const childrenMap = <Input, Output>(
-  children: Children<Input>,
-  func: (input: Input) => Output
-): Children<Output> => {
-  switch (children.tag) {
-    case childrenElementListTag:
-      return {
-        tag: childrenElementListTag,
-        value: mapMapValue(children.value, (element) =>
-          elementMap(element, func)
-        ),
-      };
-    case childrenTextTag:
-      return children;
-  }
-};
-
-const mapClickMessageData = <Input, Output>(
-  clickMessageData: ClickMessageData<Input> | null,
-  func: (input: Input) => Output
-): ClickMessageData<Output> | null => {
-  if (clickMessageData === null) {
-    return null;
-  }
-  return {
-    ignoreNewTab: clickMessageData.ignoreNewTab,
-    stopPropagation: clickMessageData.stopPropagation,
-    message: func(clickMessageData.message),
-  };
-};
+export const c = (
+  keyAndElementList: ReadonlyArray<readonly [string, Element]>
+): ReadonlyMap<string, Element> => new Map(keyAndElementList);
