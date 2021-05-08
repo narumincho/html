@@ -2,12 +2,13 @@ import {
   Children,
   Color,
   Element,
-  View,
+  Language,
+  TwitterCard,
   childrenElementListTag,
   childrenTextTag,
-} from "./view";
-import { Language, TwitterCard } from "./data";
-import { colorToHexString } from "./util";
+  colorToHexString,
+  htmlOption,
+} from "./htmlOption";
 
 /** @deprecated */
 export type Attributes = {
@@ -228,7 +229,7 @@ const twitterCardToString = (twitterCard: TwitterCard): string => {
 /**
  * View を HTML に変換する. イベントの登録は行われない
  */
-export const toString = (view: View): string =>
+export const toString = (view: htmlOption): string =>
   "<!doctype html>" +
   htmlElementToString({
     name: "html",
@@ -442,7 +443,7 @@ const elementToRawElement = (element: Element): RawElement => {
   }
 };
 
-const headElement = (view: View): RawElement => {
+const headElement = (view: htmlOption): RawElement => {
   const children: Array<RawElement> = [
     charsetElement,
     viewportElement,
@@ -464,9 +465,6 @@ const headElement = (view: View): RawElement => {
   children.push(ogImage(view.coverImageUrl));
   if (typeof view.script === "string") {
     children.push(javaScriptElement(view.script));
-  }
-  if (typeof view.scriptPath === "string") {
-    children.push(javaScriptElementByPath(view.scriptPath));
   }
   if (view.scriptUrlList !== undefined) {
     for (const scriptUrl of view.scriptUrlList) {

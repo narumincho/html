@@ -1,6 +1,4 @@
-import { Language, TwitterCard } from "./data";
-
-export type View = {
+export type htmlOption = {
   /**
    * ページ名
    *
@@ -52,9 +50,6 @@ export type View = {
 
   /** ES Modules形式のJavaScript */
   readonly script?: string;
-
-  /** メインのスクリプトのパス */
-  readonly scriptPath?: string;
 
   /** スクリプトのURL */
   readonly scriptUrlList?: ReadonlyArray<URL>;
@@ -194,10 +189,6 @@ export type ClickMessageData<Message> = {
   message: Message;
 };
 
-export type ChangeMessageData<Message> = Message;
-
-export type InputMessageData<Message> = (value: string) => Message;
-
 export const childrenElementListTag = Symbol("Children - ElementList");
 export const childrenTextTag = Symbol("Children - Text");
 
@@ -226,3 +217,35 @@ export type Color = {
   readonly g: number;
   readonly b: number;
 };
+
+/**
+ * 色を色コードに変換する
+ * ```ts
+ * { r: 1, g: 1, b: 1 }
+ * ```
+ * ↓
+ * ```ts
+ * "#ffffff"
+ * ```
+ */
+export const colorToHexString = (color: Color): string =>
+  "#" +
+  numberTo1byteString(color.r) +
+  numberTo1byteString(color.g) +
+  numberTo1byteString(color.b);
+
+/**
+ * 0...1 を 00...ff に変換する
+ */
+const numberTo1byteString = (value: number): string =>
+  Math.max(Math.min(Math.floor(value * 256), 255), 0)
+    .toString(16)
+    .padStart(2, "0");
+
+/**
+ * ナルミンチョが使う言語
+ */
+export type Language = "Japanese" | "English" | "Esperanto";
+
+/** Twitter Card。Twitterでシェアしたときの表示をどうするか */
+export type TwitterCard = "SummaryCard" | "SummaryCardWithLargeImage";

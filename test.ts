@@ -1,10 +1,13 @@
 import * as toString from "./toString";
-import { View, childrenElementList } from "./view";
+import {
+  childrenElementList,
+  colorToHexString,
+  htmlOption,
+} from "./htmlOption";
 import { div, styleToBodyClass } from "./viewUtil";
-import { colorToHexString } from "./util";
 
 describe("toString", () => {
-  const sampleHtml: View = {
+  const sampleHtml: htmlOption = {
     appName: "テストアプリ",
     pageName: "テストページ",
     language: "Japanese",

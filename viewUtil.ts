@@ -1,5 +1,10 @@
 import { CSSObject, css } from "@emotion/css";
-import { Children, Element, childrenElementList, childrenText } from "./view";
+import {
+  Children,
+  Element,
+  childrenElementList,
+  childrenText,
+} from "./htmlOption";
 
 /**
  * ```html
