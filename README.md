@@ -1,9 +1,6 @@
 # @narumincho/html
 
-Light UI Library for Web.
-
-SSR, SSG ようのライブラリだったが, CSR もサポートしだしている. 部分的な適用はできず, 全体を型がしっかりついた状態で作れる. 機能は必要になったらずい維持対応していく.
-(n-view に 改名したい)
+わかりやすい構造化されたデータから, HTML を生成するツール. SSR, SSG などに使える
 
 [![npm version](https://badge.fury.io/js/%40narumincho%2Fhtml.svg)](https://badge.fury.io/js/%40narumincho%2Fhtml)
 
