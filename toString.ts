@@ -83,6 +83,9 @@ const headElement = (view: htmlOption): HtmlElement => {
     children.push(themeColorElement(view.themeColor));
   }
   children.push(iconElement(view.iconUrl));
+  if (view.webAppManifestUrl !== undefined) {
+    children.push(webAppManifestElement(view.webAppManifestUrl));
+  }
   if (typeof view.style === "string") {
     children.push(cssStyleElement(view.style));
   }
@@ -173,6 +176,15 @@ const iconElement = (iconUrl: URL): HtmlElement =>
     new Map([
       ["rel", "icon"],
       ["href", iconUrl.toString()],
+    ])
+  );
+
+const webAppManifestElement = (url: URL): HtmlElement =>
+  htmlElementNoEndTag(
+    "link",
+    new Map([
+      ["rel", "manifest"],
+      ["href", url.toString()],
     ])
   );
 

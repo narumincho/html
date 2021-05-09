@@ -42,6 +42,13 @@ export type htmlOption = {
   /** Twitter Card。Twitterでシェアしたときの表示をどうするか */
   readonly twitterCard: TwitterCard;
 
+  /**
+   * Web App マニフェストのURL
+   *
+   * https://developer.mozilla.org/en-US/docs/Web/Manifest
+   */
+  readonly webAppManifestUrl?: URL;
+
   /** 全体に適応されるスタイル. CSS */
   readonly style?: string;
 

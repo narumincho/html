@@ -184,5 +184,8 @@
   "scripts": {
     "test": "jest --watch",
     "typeCheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@types/jest": "^26.0.23"
   }
 }
