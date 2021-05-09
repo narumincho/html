@@ -1,5 +1,4 @@
-import { colorToHexString, htmlOption } from "./htmlOption";
-import { div, toString } from "./toString";
+import { colorToHexString, div, htmlOption, htmlOptionToString } from "./main";
 
 describe("toString", () => {
   const sampleHtml: htmlOption = {
@@ -16,7 +15,7 @@ describe("toString", () => {
     children: [div({}, "それな")],
     themeColor: undefined,
   };
-  const htmlAsString: string = toString(sampleHtml);
+  const htmlAsString: string = htmlOptionToString(sampleHtml);
   console.log(htmlAsString);
   it("include doctype html", () => {
     expect(htmlAsString).toMatchSnapshot();

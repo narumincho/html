@@ -1,2 +1,2 @@
-export * as view from "./htmlOption";
-export * as toString from "./toString";
+export * from "./data";
+export * from "./toString";
