@@ -1,200 +1,13 @@
 import {
-  Children,
   Color,
-  Element,
-  View,
-  childrenElementListTag,
-  childrenTextTag,
-} from "./view";
-import { Language, TwitterCard } from "./data";
-import { colorToHexString } from "./util";
-
-/** @deprecated */
-export type Attributes = {
-  id?: string;
-  class?: string;
-};
-
-const attributesToMap = (
-  attributes: Attributes
-): ReadonlyMap<string, string | null> => {
-  const attributeMap: Map<string, string | null> = new Map();
-  if (attributes.id !== undefined) {
-    attributeMap.set("id", attributes.id);
-  }
-  if (attributes.class !== undefined) {
-    attributeMap.set("class", attributes.class);
-  }
-  return attributeMap;
-};
-
-/**
- * 見出し
- * @deprecated
- */
-export const h1 = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => rawElement("h1", attributesToMap(attributes), children);
-
-/**
- * 見出し
- * @deprecated
- */
-export const h2 = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => rawElement("h2", attributesToMap(attributes), children);
-
-/**
- * 見出し
- * @deprecated
- */
-export const h3 = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => rawElement("h3", attributesToMap(attributes), children);
-
-/**
- * 区切り
- * @deprecated
- */
-export const section = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement>
-): RawElement => rawElement("section", attributesToMap(attributes), children);
-
-/**
- * 引用
- * @deprecated
- */
-export const quote = (
-  attributes: Attributes & { cite?: URL },
-  children: ReadonlyArray<RawElement> | string
-): RawElement =>
-  rawElement(
-    "quote",
-    attributes.cite === undefined
-      ? attributesToMap(attributes)
-      : new Map([
-          ...attributesToMap(attributes),
-          ["cite", attributes.cite.toString()],
-        ]),
-    children
-  );
-
-/**
- * プログラムのコード
- * @deprecated
- */
-export const code = (
-  attributes: Attributes,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => rawElement("code", attributesToMap(attributes), children);
-
-/**
- * @narumincho/htmlにないHTML要素を使いたいときに使うもの。
- * 低レベルAPI @deprecated
- * @param name 要素名
- * @param attributes 属性
- * @param children 子要素
- */
-const rawElement = (
-  name: string,
-  attributes: ReadonlyMap<string, string | null>,
-  children: ReadonlyArray<RawElement> | string
-): RawElement => ({
-  name,
-  attributes,
-  children:
-    typeof children === "string"
-      ? { tag: "Text", text: children }
-      : { tag: "HtmlElementList", value: children },
-});
-
-/**
- * エスケープしないカスタマイズ要素。低レベルAPI
- * ```html
- * <script type="x-shader/x-vertex">
- * attribute vec3 position;
- * uniform   mat4 mvpMatrix;
- *
- * void main(void) {
- *     gl_Position = mvpMatrix * vec4(position, 1.0);
- * }
- * </script>
- * ```
- * @param name 要素名
- * @param attributes 属性
- * @param text エスケープしないテキスト
- */
-const rawElementRawText = (
-  name: string,
-  attributes: ReadonlyMap<string, string | null>,
-  text: string
-): RawElement => ({
-  name,
-  attributes,
-  children: {
-    tag: "RawText",
-    text,
-  },
-});
-
-/**
- * 閉じタグがないカスタマイズ要素。低レベルAPI
- * `<meta name="rafya">`
- * @param name 要素名
- * @param attributes 属性
- */
-export const rawElementNoEndTag = (
-  name: string,
-  attributes: ReadonlyMap<string, string | null>
-): RawElement => ({
-  name,
-  attributes,
-  children: {
-    tag: "NoEndTag",
-  },
-});
-
-/**
- * HtmlElement (need validated)
- */
-export type RawElement = {
-  name: string;
-  /**
-   * 属性名は正しい必要がある。
-   * value=nullの意味は、属性値がないということ。
-   * `<button disabled>`
-   */
-  attributes: ReadonlyMap<string, string | null>;
-  /**
-   * 子供。
-   * `<path d="M1,2 L20,53"/>`のような閉じカッコの省略はしない
-   */
-  children: RawChildren;
-};
-
-/**
- * 子要素のパターン。パターンマッチングのみに使う
- */
-export type RawChildren =
-  | {
-      tag: "HtmlElementList";
-      value: ReadonlyArray<RawElement>;
-    }
-  | {
-      tag: "Text";
-      text: string;
-    }
-  | {
-      tag: "RawText";
-      text: string;
-    }
-  | {
-      tag: "NoEndTag";
-    };
+  HtmlElement,
+  Language,
+  TwitterCard,
+  htmlElement,
+  htmlElementNoEndTag,
+  htmlElementRawText,
+  htmlOption,
+} from "./data";
 
 export const escapeInHtml = (text: string): string =>
   text
@@ -228,233 +41,39 @@ const twitterCardToString = (twitterCard: TwitterCard): string => {
 /**
  * View を HTML に変換する. イベントの登録は行われない
  */
-export const toString = <Message>(view: View<Message>): string =>
+export const htmlOptionToString = (option: htmlOption): string =>
   "<!doctype html>" +
-  htmlElementToString({
-    name: "html",
-    attributes: new Map(
-      view.language === undefined
-        ? []
-        : [["lang", languageToIETFLanguageTag(view.language)]]
-    ),
-    children: {
-      tag: "HtmlElementList",
-      value: [
-        headElement(view),
-        {
-          name: "body",
-          attributes: new Map([["class", view.bodyClass]]),
-          children: appendNoScriptDescription(
-            view.appName,
-            childrenToRawChildren(view.children)
-          ),
-        },
-      ],
-    },
-  });
-
-const appendNoScriptDescription = (
-  appName: string,
-  rawChildren: RawChildren
-): RawChildren => {
-  const noScriptElement: RawElement = {
-    name: "noscript",
-    attributes: new Map(),
-    children: {
-      tag: "Text",
-      text:
-        appName +
-        "ではJavaScriptを使用します。ブラウザの設定で有効にしてください。",
-    },
-  };
-  switch (rawChildren.tag) {
-    case "HtmlElementList":
-      return {
-        tag: "HtmlElementList",
-        value: [noScriptElement, ...rawChildren.value],
-      };
-    case "NoEndTag":
-      return {
-        tag: "HtmlElementList",
-        value: [noScriptElement],
-      };
-    case "RawText":
-    case "Text":
-      return {
-        tag: "HtmlElementList",
-        value: [
-          noScriptElement,
-          { name: "div", attributes: new Map(), children: rawChildren },
-        ],
-      };
-  }
-};
-
-const childrenToRawChildren = <Message>(
-  children: Children<Message>
-): RawChildren => {
-  switch (children.tag) {
-    case childrenElementListTag:
-      return {
-        tag: "HtmlElementList",
-        value: [...children.value].map(([_, child]) =>
-          elementToRawElement(child)
-        ),
-      };
-    case childrenTextTag:
-      return { tag: "Text", text: children.value };
-  }
-};
-
-const elementToRawElement = <Message>(
-  element: Element<Message>
-): RawElement => {
-  switch (element.tag) {
-    case "animate":
-      return {
-        name: "animate",
-        attributes: new Map([
-          ["attributeName", element.attributeName],
-          ["dur", element.dur.toString()],
-          ["from", element.from],
-          ["repeatCount", element.repeatCount],
-          ["to", element.to],
-        ]),
-        children: { tag: "HtmlElementList", value: [] },
-      };
-    case "button":
-      return {
-        name: "button",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "circle":
-      return {
-        name: "circle",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-          ["cx", element.cx.toString()],
-          ["cy", element.cy.toString()],
-          ["fill", element.fill],
-          ["id", element.id],
-          ["r", element.r.toString()],
-          ["stroke", element.stroke],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "div":
-      return {
-        name: "div",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "externalLink":
-      return {
-        name: "a",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-          ["href", element.url],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "img":
-      return {
-        name: "img",
-        attributes: new Map([
-          ["alt", element.alt],
-          ["class", element.class],
-          ["id", element.id],
-          ["src", element.src],
-        ]),
-        children: { tag: "NoEndTag" },
-      };
-    case "inputRadio":
-      return {
-        name: "input",
-        attributes: new Map([
-          ["type", "radio"],
-          ["class", element.class],
-          ["id", element.id],
-          ["name", element.name],
-        ]),
-        children: { tag: "NoEndTag" },
-      };
-    case "inputText":
-      return {
-        name: "input",
-        attributes: new Map([
-          ["type", "text"],
-          ["class", element.class],
-          ["id", element.id],
-        ]),
-        children: { tag: "NoEndTag" },
-      };
-    case "label":
-      return {
-        name: "label",
-        attributes: new Map([
-          ["class", element.class],
-          ["for", element.for],
-          ["id", element.id],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "localLink":
-      return {
-        name: "a",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-          ["href", element.url],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "path":
-      return {
-        name: "path",
-        attributes: new Map([
-          ["class", element.class],
-          ["d", element.d],
-          ["fill", element.fill],
-          ["id", element.id],
-        ]),
-        children: { tag: "NoEndTag" },
-      };
-    case "svg":
-      return {
-        name: "svg",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
+  htmlElementToString(
+    htmlElement(
+      "html",
+      new Map(
+        option.language === undefined
+          ? []
+          : [["lang", languageToIETFLanguageTag(option.language)]]
+      ),
+      [
+        headElement(option),
+        htmlElement(
+          "body",
+          option.bodyClass === undefined
+            ? new Map()
+            : new Map([["class", option.bodyClass]]),
           [
-            "viewBox",
-            `${element.viewBoxX} ${element.viewBoxY} ${element.viewBoxWidth} ${element.viewBoxHeight}`,
-          ],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "textArea":
-      return {
-        name: "textarea",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-        ]),
-        children: { tag: "NoEndTag" },
-      };
-  }
-};
+            htmlElement(
+              "noscript",
+              new Map(),
+              option.appName +
+                " では JavaScript を使用します. ブラウザの設定で有効にしてください."
+            ),
+            ...option.children,
+          ]
+        ),
+      ]
+    )
+  );
 
-const headElement = <Message>(view: View<Message>): RawElement => {
-  const children: Array<RawElement> = [
+const headElement = (view: htmlOption): HtmlElement => {
+  const children: Array<HtmlElement> = [
     charsetElement,
     viewportElement,
     pageNameElement(view.pageName),
@@ -463,9 +82,9 @@ const headElement = <Message>(view: View<Message>): RawElement => {
   if (view.themeColor !== undefined) {
     children.push(themeColorElement(view.themeColor));
   }
-  children.push(iconElement(view.iconPath));
-  if (view.manifestPath !== undefined) {
-    children.push(manifestElement(view.manifestPath));
+  children.push(iconElement(view.iconUrl));
+  if (view.webAppManifestUrl !== undefined) {
+    children.push(webAppManifestElement(view.webAppManifestUrl));
   }
   if (typeof view.style === "string") {
     children.push(cssStyleElement(view.style));
@@ -479,9 +98,6 @@ const headElement = <Message>(view: View<Message>): RawElement => {
   if (typeof view.script === "string") {
     children.push(javaScriptElement(view.script));
   }
-  if (typeof view.scriptPath === "string") {
-    children.push(javaScriptElementByPath(view.scriptPath));
-  }
   if (view.scriptUrlList !== undefined) {
     for (const scriptUrl of view.scriptUrlList) {
       children.push(javaScriptElementByUrl(scriptUrl));
@@ -493,22 +109,15 @@ const headElement = <Message>(view: View<Message>): RawElement => {
     }
   }
 
-  return {
-    name: "head",
-    attributes: new Map(),
-    children: {
-      tag: "HtmlElementList",
-      value: children,
-    },
-  };
+  return htmlElement("head", new Map(), children);
 };
 
-const charsetElement: RawElement = rawElementNoEndTag(
+const charsetElement: HtmlElement = htmlElementNoEndTag(
   "meta",
   new Map([["charset", "utf-8"]])
 );
 
-const viewportElement: RawElement = rawElementNoEndTag(
+const viewportElement: HtmlElement = htmlElementNoEndTag(
   "meta",
   new Map([
     ["name", "viewport"],
@@ -516,11 +125,11 @@ const viewportElement: RawElement = rawElementNoEndTag(
   ])
 );
 
-const pageNameElement = (pageName: string): RawElement =>
-  rawElement("title", new Map(), pageName);
+const pageNameElement = (pageName: string): HtmlElement =>
+  htmlElement("title", new Map(), pageName);
 
-const descriptionElement = (description: string): RawElement =>
-  rawElementNoEndTag(
+const descriptionElement = (description: string): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["name", "description"],
@@ -528,8 +137,8 @@ const descriptionElement = (description: string): RawElement =>
     ])
   );
 
-const themeColorElement = (themeColor: Color): RawElement =>
-  rawElementNoEndTag(
+const themeColorElement = (themeColor: Color): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["name", "theme-color"],
@@ -537,29 +146,53 @@ const themeColorElement = (themeColor: Color): RawElement =>
     ])
   );
 
-const iconElement = (iconPath: string): RawElement =>
-  rawElementNoEndTag(
+/**
+ * 色を色コードに変換する
+ * ```ts
+ * { r: 1, g: 1, b: 1 }
+ * ```
+ * ↓
+ * ```ts
+ * "#ffffff"
+ * ```
+ */
+export const colorToHexString = (color: Color): string =>
+  "#" +
+  numberTo1byteString(color.r) +
+  numberTo1byteString(color.g) +
+  numberTo1byteString(color.b);
+
+/**
+ * 0...1 を 00...ff に変換する
+ */
+const numberTo1byteString = (value: number): string =>
+  Math.max(Math.min(Math.floor(value * 256), 255), 0)
+    .toString(16)
+    .padStart(2, "0");
+
+const iconElement = (iconUrl: URL): HtmlElement =>
+  htmlElementNoEndTag(
     "link",
     new Map([
       ["rel", "icon"],
-      ["href", iconPath],
+      ["href", iconUrl.toString()],
     ])
   );
 
-const manifestElement = (path: ReadonlyArray<string>): RawElement =>
-  rawElementNoEndTag(
+const webAppManifestElement = (url: URL): HtmlElement =>
+  htmlElementNoEndTag(
     "link",
     new Map([
       ["rel", "manifest"],
-      ["href", "/" + path.map(escapeUrl).join("/")],
+      ["href", url.toString()],
     ])
   );
 
-const cssStyleElement = (cssCode: string): RawElement =>
-  rawElementRawText("style", new Map(), cssCode);
+const cssStyleElement = (cssCode: string): HtmlElement =>
+  htmlElementRawText("style", new Map(), cssCode);
 
-const twitterCardElement = (twitterCard: TwitterCard): RawElement =>
-  rawElementNoEndTag(
+const twitterCardElement = (twitterCard: TwitterCard): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["name", "twitter:card"],
@@ -567,8 +200,8 @@ const twitterCardElement = (twitterCard: TwitterCard): RawElement =>
     ])
   );
 
-const ogUrlElement = (url: URL): RawElement =>
-  rawElementNoEndTag(
+const ogUrlElement = (url: URL): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["property", "og:url"],
@@ -576,8 +209,8 @@ const ogUrlElement = (url: URL): RawElement =>
     ])
   );
 
-const ogTitleElement = (title: string): RawElement =>
-  rawElementNoEndTag(
+const ogTitleElement = (title: string): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["property", "og:title"],
@@ -585,8 +218,8 @@ const ogTitleElement = (title: string): RawElement =>
     ])
   );
 
-const ogSiteName = (siteName: string): RawElement =>
-  rawElementNoEndTag(
+const ogSiteName = (siteName: string): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["property", "og:site_name"],
@@ -594,8 +227,8 @@ const ogSiteName = (siteName: string): RawElement =>
     ])
   );
 
-const ogDescription = (description: string): RawElement =>
-  rawElementNoEndTag(
+const ogDescription = (description: string): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["property", "og:description"],
@@ -603,8 +236,8 @@ const ogDescription = (description: string): RawElement =>
     ])
   );
 
-const ogImage = (url: URL): RawElement =>
-  rawElementNoEndTag(
+const ogImage = (url: URL): HtmlElement =>
+  htmlElementNoEndTag(
     "meta",
     new Map([
       ["property", "og:image"],
@@ -612,20 +245,11 @@ const ogImage = (url: URL): RawElement =>
     ])
   );
 
-const javaScriptElement = (javaScriptCode: string): RawElement =>
-  rawElementRawText("script", new Map([["type", "module"]]), javaScriptCode);
+const javaScriptElement = (javaScriptCode: string): HtmlElement =>
+  htmlElementRawText("script", new Map([["type", "module"]]), javaScriptCode);
 
-const javaScriptElementByPath = (path: string): RawElement => ({
-  name: "script",
-  attributes: new Map([
-    ["defer", null],
-    ["src", path],
-  ]),
-  children: { tag: "Text", text: "" },
-});
-
-const javaScriptElementByUrl = (url: URL): RawElement =>
-  rawElement(
+const javaScriptElementByUrl = (url: URL): HtmlElement =>
+  htmlElement(
     "script",
     new Map([
       ["defer", null],
@@ -634,8 +258,8 @@ const javaScriptElementByUrl = (url: URL): RawElement =>
     []
   );
 
-const styleElementByUrl = (url: URL): RawElement =>
-  rawElementNoEndTag(
+const styleElementByUrl = (url: URL): HtmlElement =>
+  htmlElementNoEndTag(
     "link",
     new Map([
       ["rel", "stylesheet"],
@@ -643,28 +267,22 @@ const styleElementByUrl = (url: URL): RawElement =>
     ])
   );
 
-const escapeUrl = (text: string): string =>
-  encodeURIComponent(text).replace(
-    /[!'()*]/gu,
-    (c: string) => "%" + c.charCodeAt(0).toString(16)
-  );
-
-const htmlElementToString = (htmlElement: RawElement): string => {
+const htmlElementToString = (element: HtmlElement): string => {
   const startTag =
-    "<" + htmlElement.name + attributesToString(htmlElement.attributes) + ">";
-  const endTag = "</" + htmlElement.name + ">";
-  switch (htmlElement.children.tag) {
-    case "HtmlElementList":
+    "<" + element.name + attributesToString(element.attributes) + ">";
+  const endTag = "</" + element.name + ">";
+  switch (element.children.tag) {
+    case "elementList":
       return (
         startTag +
-        htmlElement.children.value.map(htmlElementToString).join("") +
+        element.children.value.map(htmlElementToString).join("") +
         endTag
       );
-    case "Text":
-      return startTag + escapeInHtml(htmlElement.children.text) + endTag;
-    case "RawText":
-      return startTag + htmlElement.children.text + endTag;
-    case "NoEndTag":
+    case "text":
+      return startTag + escapeInHtml(element.children.text) + endTag;
+    case "rawText":
+      return startTag + element.children.text + endTag;
+    case "noEndTag":
       return startTag;
   }
 };
