@@ -106,14 +106,7 @@ const headElement = (view: htmlOption): HtmlElement => {
     }
   }
 
-  return {
-    name: "head",
-    attributes: new Map(),
-    children: {
-      tag: "HtmlElementList",
-      value: children,
-    },
-  };
+  return htmlElement("head", new Map(), children);
 };
 
 const charsetElement: HtmlElement = htmlElementNoEndTag(
@@ -267,17 +260,17 @@ const htmlElementToString = (element: HtmlElement): string => {
     "<" + element.name + attributesToString(element.attributes) + ">";
   const endTag = "</" + element.name + ">";
   switch (element.children.tag) {
-    case "HtmlElementList":
+    case "elementList":
       return (
         startTag +
         element.children.value.map(htmlElementToString).join("") +
         endTag
       );
-    case "Text":
+    case "text":
       return startTag + escapeInHtml(element.children.text) + endTag;
-    case "RawText":
+    case "rawText":
       return startTag + element.children.text + endTag;
-    case "NoEndTag":
+    case "noEndTag":
       return startTag;
   }
 };
