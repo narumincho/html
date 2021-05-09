@@ -1,11 +1,7 @@
 import {
-  Children,
   Color,
-  Element,
   Language,
   TwitterCard,
-  childrenElementListTag,
-  childrenTextTag,
   colorToHexString,
   htmlOption,
 } from "./htmlOption";
@@ -16,7 +12,7 @@ export type CommonAttributes = {
   class?: string;
 };
 
-const attributesToMap = (
+const commonAttributesToMap = (
   attributes: CommonAttributes
 ): ReadonlyMap<string, string | null> => {
   const attributeMap: Map<string, string | null> = new Map();
@@ -31,27 +27,201 @@ const attributesToMap = (
 
 /**
  * ページの見出し
+ * ```html
+ * <h1></h1>
+ * ```
  */
 export const h1 = (
   attributes: CommonAttributes,
   children: ReadonlyArray<HtmlElement> | string
-): HtmlElement => htmlElement("h1", attributesToMap(attributes), children);
+): HtmlElement =>
+  htmlElement("h1", commonAttributesToMap(attributes), children);
 
 /**
  * 見出し
+ * ```html
+ * <h2></h2>
+ * ```
  */
 export const h2 = (
   attributes: CommonAttributes,
   children: ReadonlyArray<HtmlElement> | string
-): HtmlElement => htmlElement("h2", attributesToMap(attributes), children);
+): HtmlElement =>
+  htmlElement("h2", commonAttributesToMap(attributes), children);
 
 /**
  * 見出し
+ * ```html
+ * <h3></h3>
+ * ```
  */
 export const h3 = (
   attributes: CommonAttributes,
   children: ReadonlyArray<HtmlElement> | string
-): HtmlElement => htmlElement("h3", attributesToMap(attributes), children);
+): HtmlElement =>
+  htmlElement("h3", commonAttributesToMap(attributes), children);
+
+/**
+ * ```html
+ * <div></div>
+ * ```
+ */
+export const div = (
+  attributes: CommonAttributes,
+  children: ReadonlyArray<HtmlElement> | string
+): HtmlElement =>
+  htmlElement("div", commonAttributesToMap(attributes), children);
+
+/**
+ * ```html
+ * <a href={attributes.url}></a>
+ * ```
+ */
+export const anchor = (
+  attributes: CommonAttributes & {
+    url: URL;
+  },
+  children: ReadonlyArray<HtmlElement> | string
+): HtmlElement =>
+  htmlElement(
+    "a",
+    new Map([
+      ...commonAttributesToMap(attributes),
+      ["href", attributes.url.toString()],
+    ]),
+    children
+  );
+
+/**
+ * ```html
+ * <img alt={attributes.alt} src={attributes.src}>
+ * ```
+ */
+export const image = (
+  attributes: CommonAttributes & {
+    /** 画像のテキストによる説明 */
+    alt: string;
+    /** 画像のURL. */
+    src: URL;
+  }
+): HtmlElement =>
+  htmlElementNoEndTag(
+    "img",
+    new Map([
+      ...commonAttributesToMap(attributes),
+      ["alt", attributes.alt],
+      ["src", attributes.src.toString()],
+    ])
+  );
+
+/**
+ * ```html
+ * <svg></svg>
+ * ```
+ */
+export const svg = (
+  attributes: CommonAttributes & {
+    viewBox: { x: number; y: number; width: number; height: number };
+  },
+  children: ReadonlyArray<HtmlElement>
+): HtmlElement =>
+  htmlElement(
+    "svg",
+    new Map([
+      ...commonAttributesToMap(attributes),
+      [
+        "viewBox",
+        [
+          attributes.viewBox.x,
+          attributes.viewBox.y,
+          attributes.viewBox.width,
+          attributes.viewBox.height,
+        ].join(" "),
+      ],
+    ]),
+    children
+  );
+
+/**
+ * ```html
+ * <path />
+ * ```
+ */
+export const path = (
+  attributes: CommonAttributes & {
+    d: string;
+    fill: string;
+  }
+): HtmlElement =>
+  htmlElement(
+    "path",
+    new Map([
+      ...commonAttributesToMap(attributes),
+      ["d", attributes.d],
+      ["fill", attributes.fill],
+    ]),
+    ""
+  );
+
+/** SVGの要素のアニメーションを指定する. 繰り返す回数は無限回と指定している */
+type SvgAnimation = {
+  attributeName: "cy" | "r" | "stroke";
+  /** 時間 */
+  dur: number;
+  /** 開始時の値 */
+  from: number | string;
+  /** 終了時の値 */
+  to: number | string;
+};
+
+/**
+ * ```html
+ * <circle><circle>
+ * ```
+ */
+export const circle = (
+  attributes: CommonAttributes & {
+    cx: number;
+    cy: number;
+    fill: string;
+    r: number;
+    stroke: string;
+    animations?: ReadonlyArray<SvgAnimation>;
+  }
+): HtmlElement => {
+  return htmlElement(
+    "circle",
+    new Map([
+      ...commonAttributesToMap(attributes),
+      ["cx", attributes.cx.toString()],
+      ["cy", attributes.cy.toString()],
+      ["fill", attributes.fill],
+      ["r", attributes.r.toString()],
+      ["stroke", attributes.stroke],
+    ]),
+    attributes.animations === undefined
+      ? ""
+      : attributes.animations.map(animate)
+  );
+};
+
+/**
+ * ```html
+ * <animate />
+ * ```
+ */
+const animate = (svgAnimation: SvgAnimation): HtmlElement =>
+  htmlElement(
+    "animate",
+    new Map([
+      ["attributeName", svgAnimation.attributeName],
+      ["dur", svgAnimation.dur.toString()],
+      ["from", svgAnimation.from.toString()],
+      ["repeatCount", "indefinite"],
+      ["to", svgAnimation.to.toString()],
+    ]),
+    ""
+  );
 
 /**
  * @narumincho/htmlにないHTML要素を使いたいときに使うもの。
@@ -194,213 +364,34 @@ const twitterCardToString = (twitterCard: TwitterCard): string => {
  */
 export const toString = (view: htmlOption): string =>
   "<!doctype html>" +
-  htmlElementToString({
-    name: "html",
-    attributes: new Map(
-      view.language === undefined
-        ? []
-        : [["lang", languageToIETFLanguageTag(view.language)]]
-    ),
-    children: {
-      tag: "HtmlElementList",
-      value: [
+  htmlElementToString(
+    htmlElement(
+      "html",
+      new Map(
+        view.language === undefined
+          ? []
+          : [["lang", languageToIETFLanguageTag(view.language)]]
+      ),
+      [
         headElement(view),
-        {
-          name: "body",
-          attributes:
-            view.bodyClass === undefined
-              ? new Map()
-              : new Map([["class", view.bodyClass]]),
-          children: appendNoScriptDescription(
-            view.appName,
-            childrenToRawChildren(view.children)
-          ),
-        },
-      ],
-    },
-  });
-
-const appendNoScriptDescription = (
-  appName: string,
-  rawChildren: HtmlChildren
-): HtmlChildren => {
-  const noScriptElement: HtmlElement = htmlElement(
-    "noscript",
-    new Map(),
-    appName +
-      " では JavaScript を使用します. ブラウザの設定で有効にしてください."
-  );
-  switch (rawChildren.tag) {
-    case "HtmlElementList":
-      return {
-        tag: "HtmlElementList",
-        value: [noScriptElement, ...rawChildren.value],
-      };
-    case "NoEndTag":
-      return {
-        tag: "HtmlElementList",
-        value: [noScriptElement],
-      };
-    case "RawText":
-    case "Text":
-      return {
-        tag: "HtmlElementList",
-        value: [
-          noScriptElement,
-          { name: "div", attributes: new Map(), children: rawChildren },
-        ],
-      };
-  }
-};
-
-const childrenToRawChildren = (children: Children): HtmlChildren => {
-  switch (children.tag) {
-    case childrenElementListTag:
-      return {
-        tag: "HtmlElementList",
-        value: [...children.value].map(([_, child]) =>
-          elementToRawElement(child)
-        ),
-      };
-    case childrenTextTag:
-      return { tag: "Text", text: children.value };
-  }
-};
-
-const elementToRawElement = (element: Element): HtmlElement => {
-  switch (element.tag) {
-    case "animate":
-      return {
-        name: "animate",
-        attributes: new Map([
-          ["attributeName", element.attributeName],
-          ["dur", element.dur.toString()],
-          ["from", element.from],
-          ["repeatCount", element.repeatCount],
-          ["to", element.to],
-        ]),
-        children: { tag: "HtmlElementList", value: [] },
-      };
-    case "button":
-      return {
-        name: "button",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "circle":
-      return {
-        name: "circle",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-          ["cx", element.cx.toString()],
-          ["cy", element.cy.toString()],
-          ["fill", element.fill],
-          ["id", element.id],
-          ["r", element.r.toString()],
-          ["stroke", element.stroke],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "div":
-      return {
-        name: "div",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "anchor":
-      return {
-        name: "a",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-          ["href", element.url],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "img":
-      return {
-        name: "img",
-        attributes: new Map([
-          ["alt", element.alt],
-          ["class", element.class],
-          ["id", element.id],
-          ["src", element.src],
-        ]),
-        children: { tag: "NoEndTag" },
-      };
-    case "inputRadio":
-      return {
-        name: "input",
-        attributes: new Map([
-          ["type", "radio"],
-          ["class", element.class],
-          ["id", element.id],
-          ["name", element.name],
-        ]),
-        children: { tag: "NoEndTag" },
-      };
-    case "inputText":
-      return {
-        name: "input",
-        attributes: new Map([
-          ["type", "text"],
-          ["class", element.class],
-          ["id", element.id],
-        ]),
-        children: { tag: "NoEndTag" },
-      };
-    case "label":
-      return {
-        name: "label",
-        attributes: new Map([
-          ["class", element.class],
-          ["for", element.for],
-          ["id", element.id],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "path":
-      return {
-        name: "path",
-        attributes: new Map([
-          ["class", element.class],
-          ["d", element.d],
-          ["fill", element.fill],
-          ["id", element.id],
-        ]),
-        children: { tag: "NoEndTag" },
-      };
-    case "svg":
-      return {
-        name: "svg",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
+        htmlElement(
+          "body",
+          view.bodyClass === undefined
+            ? new Map()
+            : new Map([["class", view.bodyClass]]),
           [
-            "viewBox",
-            `${element.viewBoxX} ${element.viewBoxY} ${element.viewBoxWidth} ${element.viewBoxHeight}`,
-          ],
-        ]),
-        children: childrenToRawChildren(element.children),
-      };
-    case "textArea":
-      return {
-        name: "textarea",
-        attributes: new Map([
-          ["class", element.class],
-          ["id", element.id],
-        ]),
-        children: { tag: "NoEndTag" },
-      };
-  }
-};
+            htmlElement(
+              "noscript",
+              new Map(),
+              view.appName +
+                " では JavaScript を使用します. ブラウザの設定で有効にしてください."
+            ),
+            ...view.children,
+          ]
+        ),
+      ]
+    )
+  );
 
 const headElement = (view: htmlOption): HtmlElement => {
   const children: Array<HtmlElement> = [

@@ -1,10 +1,5 @@
-import * as toString from "./toString";
-import {
-  childrenElementList,
-  colorToHexString,
-  htmlOption,
-} from "./htmlOption";
-import { div, styleToBodyClass } from "./viewUtil";
+import { colorToHexString, htmlOption } from "./htmlOption";
+import { div, toString } from "./toString";
 
 describe("toString", () => {
   const sampleHtml: htmlOption = {
@@ -18,11 +13,10 @@ describe("toString", () => {
     url: new URL("https://narumincho.com"),
     scriptUrlList: [],
     styleUrlList: [],
-    bodyClass: styleToBodyClass(),
-    children: childrenElementList(new Map([["e", div({}, "それな")]])),
+    children: [div({}, "それな")],
     themeColor: undefined,
   };
-  const htmlAsString: string = toString.toString(sampleHtml);
+  const htmlAsString: string = toString(sampleHtml);
   console.log(htmlAsString);
   it("include doctype html", () => {
     expect(htmlAsString).toMatchSnapshot();
